@@ -1,102 +1,226 @@
 import { Link } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
 import { usePageContent } from "../hooks/usePageContent";
+import { supabase } from "../lib/supabaseClient";
+import {
+  homeHero,
+  whatWeDoCards,
+  credibilityBullets,
+  howWeWorkSteps,
+} from "../content/siteContent";
 
 export default function HomePage() {
   const { page, loading, error } = usePageContent("home");
+  const [posts, setPosts] = useState([]);
+  const [postsLoading, setPostsLoading] = useState(true);
+
+  useEffect(() => {
+    const load = async () => {
+      const { data, error: postError } = await supabase
+        .from("posts")
+        .select("id, title, slug, excerpt, published_at, hero_image_url")
+        .eq("status", "published")
+        .order("published_at", { ascending: false })
+        .limit(3);
+
+      if (!postError) {
+        setPosts(data || []);
+      }
+      setPostsLoading(false);
+    };
+
+    load();
+  }, []);
+
+  const hasFeatured = useMemo(() => !postsLoading && posts.length > 0, [postsLoading, posts]);
+
+  const formatDate = (date) =>
+    date ? new Date(date).toLocaleDateString(undefined, { month: "long", day: "numeric", year: "numeric" }) : "";
+
+  const placeholderImg =
+    "https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?auto=format&fit=crop&w=900&q=80";
 
   return (
-    <section className="max-w-6xl mx-auto px-4 py-10 md:py-14">
-      <div className="glass-panel p-6 md:p-10 space-y-8 fade-in">
-        <div className="relative overflow-hidden rounded-2xl border border-white/50 shadow-sm">
-          <img
-            src="/homePage.webp"
-            alt="Campbell Consulting team collaborating in the office"
-            className="w-full h-72 md:h-96 object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/65 via-black/35 to-transparent" />
-          <div className="absolute inset-0 flex flex-col justify-end md:justify-center px-6 py-6 md:px-10 space-y-3 max-w-3xl text-white">
-            <p className="text-sm uppercase tracking-[0.18em] text-white/80">Welcome To</p>
-            <h1 className="text-2xl md:text-4xl font-bold leading-snug">
-              Campbell Consulting Services of Tallahassee LLC
-            </h1>
-            <p className="text-xs md:text-sm font-semibold tracking-[0.14em] text-white/85">
-              UEI: XPD2XYN36QC1&nbsp;&nbsp; CAGE: 8AZP4
+    <div className="max-w-6xl mx-auto px-4 py-10 md:py-14 space-y-12">
+      <section className="relative overflow-hidden rounded-2xl border border-white/50 shadow-sm">
+        <img
+          src="/homePage.webp"
+          alt="Campbell Consulting team collaborating in the office"
+          className="w-full h-[440px] md:h-[520px] object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/45 to-transparent" />
+        <div className="absolute inset-0 flex flex-col justify-center px-6 md:px-10 space-y-4 max-w-3xl text-white">
+          <p className="pill inline-flex bg-white/20 px-3 py-1 text-[11px] uppercase tracking-[0.24em] text-white">
+            {homeHero.eyebrow}
+          </p>
+          <h1 className="text-3xl md:text-5xl font-bold leading-snug">{homeHero.title}</h1>
+          <p className="text-base md:text-lg text-white/90">{homeHero.subtitle}</p>
+          <div className="flex flex-wrap gap-3 pt-2">
+            <Link
+              to={homeHero.primaryCta.to}
+              className="inline-flex items-center rounded-full bg-[#2fb3d5] px-5 py-2.5 text-sm md:text-base font-semibold text-white shadow-sm hover:bg-[#2295b2] transition"
+            >
+              {homeHero.primaryCta.label}
+            </Link>
+            <Link
+              to={homeHero.secondaryCta.to}
+              className="inline-flex items-center rounded-full border border-white/60 bg-white/10 px-5 py-2.5 text-sm md:text-base font-semibold text-white hover:bg-white/20 transition"
+            >
+              {homeHero.secondaryCta.label}
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="glass-panel p-6 md:p-8 space-y-6 fade-in">
+        <div className="flex flex-col gap-2">
+          <p className="pill inline-flex bg-white/80 px-3 py-1 text-xs uppercase tracking-[0.18em] text-gray-700 w-fit">
+            What We Do
+          </p>
+          <h2 className="text-2xl md:text-3xl font-bold text-[#0f1a0f]">Clarity, delivery, and intelligent tools</h2>
+          <p className="text-gray-700 max-w-3xl">
+            Three focused service lines to move leaders from uncertainty to measurable outcomes.
+          </p>
+        </div>
+        <div className="grid gap-5 md:grid-cols-3">
+          {whatWeDoCards.map((card) => (
+            <div key={card.id} className="glass-panel border border-gray-100 shadow-sm p-5 space-y-3">
+              <h3 className="text-xl font-semibold text-[#0f1a0f]">{card.title}</h3>
+              <p className="text-gray-700 text-sm leading-relaxed">{card.description}</p>
+              <Link to={card.href} className="text-[#2fb3d5] font-semibold text-sm hover:text-[#0f1a0f]">
+                Learn more
+              </Link>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {hasFeatured ? (
+        <section className="glass-panel p-6 md:p-8 space-y-6 fade-in">
+          <div className="flex flex-col gap-2">
+            <p className="pill inline-flex bg-white/80 px-3 py-1 text-xs uppercase tracking-[0.18em] text-gray-700 w-fit">
+              Featured Insights
             </p>
-            <p className="text-sm md:text-base text-white/90">
-              CCST LLC is a Florida-based, SDVOSB-certified firm delivering expert consulting
-              services in IT strategy, data governance, and cybersecurity. Our team ensures
-              mission success by aligning modern technology solutions with federal objectives
-              through a collaborative and agile approach.
-            </p>
+            <h2 className="text-2xl font-bold text-[#0f1a0f]">Latest thinking from the team</h2>
+            <p className="text-gray-700">Highlights without needing frequent updates.</p>
+          </div>
+          <div className="grid gap-5 md:grid-cols-3">
+            {posts.map((post) => (
+              <article key={post.id} className="glass-panel border border-gray-100 shadow-sm p-4 space-y-3">
+                <Link to={`/articles/${post.slug}`} className="block overflow-hidden rounded-md border border-gray-200">
+                  <img
+                    src={post.hero_image_url || placeholderImg}
+                    alt={post.title}
+                    className="w-full h-44 object-cover"
+                    loading="lazy"
+                  />
+                </Link>
+                <div className="space-y-2">
+                  <h3 className="text-lg font-semibold text-[#0f1a0f] leading-snug">
+                    <Link to={`/articles/${post.slug}`} className="hover:text-[#2fb3d5]">
+                      {post.title}
+                    </Link>
+                  </h3>
+                  {post.excerpt && <p className="text-sm text-gray-700">{post.excerpt}</p>}
+                </div>
+                <p className="text-xs text-gray-600">{formatDate(post.published_at)}</p>
+              </article>
+            ))}
+          </div>
+          <Link
+            to="/articles"
+            className="inline-flex w-fit items-center rounded-full bg-[#0f1a0f] px-4 py-2 text-sm font-semibold text-white hover:bg-black transition"
+          >
+            View All Insights
+          </Link>
+        </section>
+      ) : null}
+
+      <section className="glass-panel p-6 md:p-8 grid gap-8 md:grid-cols-[1.2fr_0.8fr] items-start fade-in">
+        <div className="space-y-4">
+          <p className="pill inline-flex bg-white/80 px-3 py-1 text-xs uppercase tracking-[0.18em] text-gray-700 w-fit">
+            Why Organizations Choose CCST
+          </p>
+          <h2 className="text-2xl md:text-3xl font-bold text-[#0f1a0f]">
+            A disciplined approach grounded in systems thinking
+          </h2>
+          <p className="text-gray-700">
+            Structure, clarity, and full lifecycle expertise so technology initiatives align with organizational goals.
+          </p>
+          <div className="grid gap-3">
+            {credibilityBullets.map((item) => (
+              <div key={item} className="flex items-start gap-3 text-gray-800">
+                <span className="mt-1 h-2 w-2 rounded-full bg-[#2fb3d5]" />
+                <span>{item}</span>
+              </div>
+            ))}
+          </div>
+          <div className="flex flex-wrap gap-3 pt-1">
+            <Link
+              to="/contact"
+              className="inline-flex items-center rounded-full bg-[#2fb3d5] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#2295b2] transition"
+            >
+              Contact Us
+            </Link>
+            <Link
+              to="/services"
+              className="inline-flex items-center rounded-full border border-[#0f1a0f] px-4 py-2 text-sm font-semibold text-[#0f1a0f] hover:bg-[#0f1a0f] hover:text-white transition"
+            >
+              Explore Our Services
+            </Link>
           </div>
         </div>
 
-        <div className="space-y-4 text-gray-800">
-          <p>
-            At Campbell Consulting Services of Tallahassee we are all about doing things right the
-            first time. Let us help you with all of your IT needs, whether its Business Process
-            Analysis or Full Life-Cycle Systems Engineering we are here to make a difference.
+        <div className="glass-panel bg-white/90 border border-gray-100 shadow-sm p-5 space-y-3">
+          <h3 className="text-xl font-semibold text-[#0f1a0f]">Ready to strengthen your next initiative?</h3>
+          <p className="text-gray-700">
+            Whether you need strategic clarity, contracting support, or intelligent automation tools, CCST is here to help.
           </p>
-          <p>
-            There are three things which make an IT project successful. These are Defining the
-            Scope, Identifying the Requirements, and complete Documentation of all phases of the
-            project. By doing these things well, we believe that we can help anyone successfully
-            complete any IT project on time and within budget while still maintaining the
-            performance desired.
+          <Link
+            to="/contact"
+            className="inline-flex items-center rounded-full bg-[#0f1a0f] px-4 py-2 text-sm font-semibold text-white hover:bg-black transition"
+          >
+            Schedule a Consultation
+          </Link>
+        </div>
+      </section>
+
+      <section className="glass-panel p-6 md:p-8 space-y-5 fade-in">
+        <div className="flex flex-col gap-2">
+          <p className="pill inline-flex bg-white/80 px-3 py-1 text-xs uppercase tracking-[0.18em] text-gray-700 w-fit">
+            How We Work
           </p>
-          <p>
-            <strong>Defining the Scope:</strong> The scope of a project is identifying the goals
-            that are to be achieved by the project. Our ability to assist you in defining these
-            goals through full systems thinking can ensure that the important pieces are not
-            overlooked.
-          </p>
-          <p>
-            <strong>Identifying the Requirements:</strong> Each project has its own unique set of
-            requirements. Requirements are the definitive list of needs which must happen to meet
-            the goals of the project set up in the scope. The elicitation process is done in
-            conjunction with all project stakeholders to ensure a comprehensive list is identified.
-            After that the list is managed through the life of the project to ensure that it is kept
-            up to date as circumstances change.
-          </p>
-          <p>
-            <strong>Complete Documentation:</strong> Each phase of the Systems Development Life
-            Cycle contains its own documentation which explains and identifies the results. Even
-            Agile project have documentation which is needed to keep things moving forward smoothly.
-            By producing the relevant documentation at the appropriate time throughout the life
-            cycle, the project can stay on time and budget.
-          </p>
-          <p className="font-semibold">Why should you work with us?</p>
-          <p>
-            With over a decade of experience, we have seen our fair share of projects go wrong. With
-            the best of intentions, the scope of a project begins to grow. Budgets get tightened and
-            the schedule slips further and further to the right. These situations can be fatal for
-            any project. By working with Campbell Consulting Services, customers can protect the
-            integrity of the project by making sure that each new need that is identified, remains
-            within the scope of the project. By working with stakeholders to produce a complete
-            scope definition and the execution of effective requirements elicitation a complete
-            picture of the project is formed. This provides the blueprint to build the project,
-            ensuring that only those things which will produce the desired results get done, saving
-            time and money.
-          </p>
-          <p>
-            Take a look and see what we have to offer{" "}
-            <Link to="/services" className="text-[#2fb3d5] font-semibold hover:text-[#0f1a0f]">
-              here
-            </Link>
-            .
+          <h2 className="text-2xl md:text-3xl font-bold text-[#0f1a0f]">Simple, predictable process</h2>
+          <p className="text-gray-700 max-w-3xl">
+            A clear path reduces uncertainty and increases conversions.
           </p>
         </div>
+        <div className="grid gap-4 md:grid-cols-4">
+          {howWeWorkSteps.map((step, index) => (
+            <div key={step.title} className="glass-panel border border-gray-100 shadow-sm p-4 space-y-2">
+              <div className="text-sm font-semibold text-[#2fb3d5]">Step {index + 1}</div>
+              <h3 className="text-lg font-semibold text-[#0f1a0f]">{step.title}</h3>
+              <p className="text-sm text-gray-700">{step.text}</p>
+            </div>
+          ))}
+        </div>
+        <Link
+          to="/contact#form"
+          className="inline-flex items-center rounded-full bg-[#0f1a0f] px-4 py-2 text-sm font-semibold text-white hover:bg-black transition"
+        >
+          Schedule a Consultation
+        </Link>
+      </section>
 
-        {loading ? (
-          <p className="text-sm text-gray-600">Loading page content...</p>
-        ) : error ? (
-          <p className="text-sm text-red-700">Failed to load content: {error}</p>
-        ) : page?.content ? (
-          <article className="prose prose-slate max-w-none">
-            <div dangerouslySetInnerHTML={{ __html: page.content }} />
-          </article>
-        ) : null}
-      </div>
-    </section>
+      {loading ? (
+        <p className="text-sm text-gray-600">Loading page content...</p>
+      ) : error ? (
+        <p className="text-sm text-red-700">Failed to load content: {error}</p>
+      ) : page?.content ? (
+        <article className="glass-panel p-6 md:p-8 prose prose-slate max-w-none fade-in">
+          <div dangerouslySetInnerHTML={{ __html: page.content }} />
+        </article>
+      ) : null}
+    </div>
   );
 }

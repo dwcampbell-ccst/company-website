@@ -1,16 +1,34 @@
 import { useState } from "react";
 import { usePageContent } from "../hooks/usePageContent";
+import { contactContent } from "../content/siteContent";
 
 export default function ContactPage() {
   const { page, loading, error } = usePageContent("contact");
   const [form, setForm] = useState({
     name: "",
     email: "",
-    subject: "",
+    company: "",
+    phone: "",
+    topics: new Set(["General Inquiry"]),
     message: "",
   });
   const [status, setStatus] = useState("");
   const [sending, setSending] = useState(false);
+
+  const toggleTopic = (topic) => {
+    setForm((prev) => {
+      const next = new Set(prev.topics);
+      if (next.has(topic)) {
+        next.delete(topic);
+      } else {
+        next.add(topic);
+      }
+      if (next.size === 0) {
+        next.add("General Inquiry");
+      }
+      return { ...prev, topics: next };
+    });
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -22,19 +40,43 @@ export default function ContactPage() {
     setSending(true);
     setStatus("");
 
+    const topicLine = Array.from(form.topics).join(", ");
+    const subject = `Contact: ${topicLine}`;
+    const body = [
+      form.message.trim(),
+      "",
+      `Topics: ${topicLine}`,
+      form.company ? `Company: ${form.company}` : null,
+      form.phone ? `Phone: ${form.phone}` : null,
+    ]
+      .filter(Boolean)
+      .join("\n");
+
     try {
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({
+          name: form.name,
+          email: form.email,
+          subject,
+          message: body,
+        }),
       });
 
       if (!res.ok) {
         throw new Error("Request failed");
       }
 
-      setStatus("Thank you! We will get back to you.");
-      setForm({ name: "", email: "", subject: "", message: "" });
+      setStatus("Thank you! We will get back to you soon.");
+      setForm({
+        name: "",
+        email: "",
+        company: "",
+        phone: "",
+        topics: new Set(["General Inquiry"]),
+        message: "",
+      });
     } catch (err) {
       setStatus("Something went wrong. Please try again.");
     } finally {
@@ -43,103 +85,167 @@ export default function ContactPage() {
   };
 
   return (
-    <section className="max-w-6xl mx-auto px-4 py-10 md:py-14 grid gap-6 md:grid-cols-[1fr_1fr] items-start">
-      <div className="glass-panel p-6 md:pt-8 space-y-4 fade-in">
-        <p className="pill inline-flex bg-white/80 px-3 py-1 text-xs uppercase tracking-[0.18em] text-gray-700">
-          Contact
-        </p>
-        <h1 className="text-3xl md:text-4xl font-bold text-[#0f1a0f]">
-          {page?.hero_title || "Ready to talk about your next delivery milestone?"}
-        </h1>
-        <p className="text-gray-700 text-lg">
-          {page?.hero_subtitle ||
-            "Send us a note and we will respond quickly with next steps."}
-        </p>
+    <section className="max-w-6xl mx-auto px-4 py-10 md:py-14 space-y-6" id="form">
+      <div className="glass-panel p-6 md:p-8 grid gap-6 md:grid-cols-[1fr_1.1fr] items-start">
+        <div className="space-y-4">
+          <p className="pill inline-flex bg-white/80 px-3 py-1 text-xs uppercase tracking-[0.18em] text-gray-700">
+            Contact
+          </p>
+          <h1 className="text-3xl md:text-4xl font-bold text-[#0f1a0f]">
+            {page?.hero_title || contactContent.introTitle}
+          </h1>
+          <p className="text-gray-700 text-lg">
+            {page?.hero_subtitle || contactContent.introSubtitle}
+          </p>
 
-        {loading ? (
-          <p className="text-sm text-gray-600">Loading contact details...</p>
-        ) : error ? (
-          <p className="text-sm text-red-700">Failed to load content: {error}</p>
-        ) : (
-          <article className="prose prose-slate max-w-none">
-            {page?.content ? (
+          {loading ? (
+            <p className="text-sm text-gray-600">Loading contact details...</p>
+          ) : error ? (
+            <p className="text-sm text-red-700">Failed to load content: {error}</p>
+          ) : page?.content ? (
+            <article className="prose prose-slate max-w-none">
               <div dangerouslySetInnerHTML={{ __html: page.content }} />
-            ) : (
-              <p>Add contact details in Supabase under slug <strong>contact</strong>.</p>
-            )}
-          </article>
-        )}
+            </article>
+          ) : null}
+
+          <div className="glass-panel bg-white/90 border border-gray-100 p-4 space-y-2">
+            <h3 className="text-lg font-semibold text-[#0f1a0f]">Contact Information</h3>
+            <ul className="space-y-1 text-sm text-gray-800">
+              <li>Email: {contactContent.contactInfo.email}</li>
+              <li>Phone: {contactContent.contactInfo.phone}</li>
+              <li>Business: {contactContent.contactInfo.business}</li>
+              <li>Location: {contactContent.contactInfo.location}</li>
+            </ul>
+            <a
+              href={contactContent.contactInfo.scheduleHref}
+              className="inline-flex items-center rounded-full bg-[#2fb3d5] px-4 py-2 text-sm font-semibold text-white hover:bg-[#2295b2] transition"
+            >
+              {contactContent.contactInfo.scheduleLabel}
+            </a>
+          </div>
+
+          <div className="space-y-2">
+            <h3 className="text-lg font-semibold text-[#0f1a0f]">Why organizations contact CCST</h3>
+            <ul className="space-y-1 text-sm text-gray-800 list-disc pl-5">
+              {contactContent.reasons.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        <div className="glass-panel p-6 md:p-8 space-y-4 fade-in">
+          <h2 className="text-xl font-semibold text-[#0f1a0f]">Send us a message</h2>
+          <form className="space-y-4" onSubmit={handleSubmit}>
+            <div className="grid md:grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <label className="text-sm font-semibold text-gray-700" htmlFor="name">
+                  Name
+                </label>
+                <input
+                  id="name"
+                  name="name"
+                  required
+                  className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2fb3d5]"
+                  value={form.name}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-sm font-semibold text-gray-700" htmlFor="email">
+                  Email
+                </label>
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  required
+                  className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2fb3d5]"
+                  value={form.email}
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <label className="text-sm font-semibold text-gray-700" htmlFor="company">
+                  Company
+                </label>
+                <input
+                  id="company"
+                  name="company"
+                  className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2fb3d5]"
+                  value={form.company}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-sm font-semibold text-gray-700" htmlFor="phone">
+                  Phone (optional)
+                </label>
+                <input
+                  id="phone"
+                  name="phone"
+                  className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2fb3d5]"
+                  value={form.phone}
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <p className="text-sm font-semibold text-gray-700">Topic / Service of Interest</p>
+              <div className="grid grid-cols-2 gap-2">
+                {contactContent.topics.map((topic) => (
+                  <label key={topic} className="flex items-center gap-2 text-sm text-gray-800">
+                    <input
+                      type="checkbox"
+                      checked={form.topics.has(topic)}
+                      onChange={() => toggleTopic(topic)}
+                      className="h-4 w-4 rounded border-gray-300 text-[#2fb3d5] focus:ring-[#2fb3d5]"
+                    />
+                    {topic}
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-sm font-semibold text-gray-700" htmlFor="message">
+                Message
+              </label>
+              <textarea
+                id="message"
+                name="message"
+                required
+                rows={5}
+                className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2fb3d5]"
+                value={form.message}
+                onChange={handleChange}
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={sending}
+              className="w-full bg-[#0f1a0f] text-white py-2 rounded-md font-semibold hover:bg-black transition disabled:opacity-70"
+            >
+              {sending ? "Sending..." : "Submit"}
+            </button>
+          </form>
+          {status && <p className="text-sm text-gray-700">{status}</p>}
+          <p className="text-xs text-gray-600">Your information is confidential and used only to respond.</p>
+        </div>
       </div>
 
-      <div className="glass-panel p-6 md:p-8 space-y-4 fade-in">
-        <h2 className="text-xl font-semibold text-[#0f1a0f]">Send a message</h2>
-        <form className="space-y-4" onSubmit={handleSubmit}>
-          <div className="space-y-1">
-            <label className="text-sm font-semibold text-gray-700" htmlFor="name">
-              Name
-            </label>
-            <input
-              id="name"
-              name="name"
-              required
-              className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2fb3d5]"
-              value={form.name}
-              onChange={handleChange}
-            />
-          </div>
-
-          <div className="space-y-1">
-            <label className="text-sm font-semibold text-gray-700" htmlFor="email">
-              Email
-            </label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              required
-              className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2fb3d5]"
-              value={form.email}
-              onChange={handleChange}
-            />
-          </div>
-
-          <div className="space-y-1">
-            <label className="text-sm font-semibold text-gray-700" htmlFor="subject">
-              Subject
-            </label>
-            <input
-              id="subject"
-              name="subject"
-              className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2fb3d5]"
-              value={form.subject}
-              onChange={handleChange}
-            />
-          </div>
-
-          <div className="space-y-1">
-            <label className="text-sm font-semibold text-gray-700" htmlFor="message">
-              Message
-            </label>
-            <textarea
-              id="message"
-              name="message"
-              required
-              rows={5}
-              className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2fb3d5]"
-              value={form.message}
-              onChange={handleChange}
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={sending}
-            className="w-full bg-[#0f1a0f] text-white py-2 rounded-md font-semibold hover:bg-black transition disabled:opacity-70"
-          >
-            {sending ? "Sending..." : "Send Message"}
-          </button>
-        </form>
-        {status && <p className="text-sm text-gray-700">{status}</p>}
+      <div
+        id="calendar"
+        className="glass-panel p-6 md:p-8 text-center text-sm text-gray-700 border border-dashed border-gray-300"
+      >
+        Calendar placeholder: embed your scheduling tool here (Calendly or similar).
       </div>
     </section>
   );

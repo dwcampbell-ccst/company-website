@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, Link } from "react-router-dom";
+import { navCta } from "../content/siteContent";
 
 const navItems = [
   { to: "/", label: "Home" },
@@ -43,6 +44,12 @@ const Header = () => {
               {item.label}
             </NavLink>
           ))}
+          <Link
+            to={navCta.to}
+            className="inline-flex items-center gap-2 rounded-full bg-[#2fb3d5] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#2295b2] transition"
+          >
+            {navCta.label}
+          </Link>
         </nav>
 
         <button
@@ -68,6 +75,13 @@ const Header = () => {
                 {item.label}
               </NavLink>
             ))}
+            <Link
+              to={navCta.to}
+              className="inline-flex items-center justify-center rounded-full bg-[#2fb3d5] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#2295b2] transition text-center"
+              onClick={closeMenu}
+            >
+              {navCta.label}
+            </Link>
           </div>
         </div>
       ) : null}

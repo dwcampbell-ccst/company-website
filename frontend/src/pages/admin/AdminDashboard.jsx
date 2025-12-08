@@ -85,7 +85,7 @@ export default function AdminDashboard() {
               {card.label}
             </p>
             <p className="text-3xl font-bold text-[#0f1a0f]">
-              {loading ? "—" : card.value}
+              {loading ? "..." : card.value}
             </p>
           </div>
         ))}

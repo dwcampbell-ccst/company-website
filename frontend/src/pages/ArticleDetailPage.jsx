@@ -84,9 +84,7 @@ export default function ArticleDetailPage() {
       });
     } else {
       window.open(
-        `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
-          pageUrl
-        )}`,
+        `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(pageUrl)}`,
         "_blank"
       );
     }
@@ -100,11 +98,11 @@ export default function ArticleDetailPage() {
             <Link to="/" className="hover:text-white/80">
               Home
             </Link>
-            <span>›</span>
+            <span>&gt;</span>
             <Link to="/articles" className="hover:text-white/80">
               Articles
             </Link>
-            <span>›</span>
+            <span>&gt;</span>
             <span className="text-white">{post.title}</span>
           </div>
 
@@ -116,16 +114,12 @@ export default function ArticleDetailPage() {
               loading="lazy"
             />
             <div className="space-y-2">
-              <h1 className="text-3xl md:text-4xl font-bold text-[#0f1a0f] leading-tight">
-                {post.title}
-              </h1>
+              <h1 className="text-3xl md:text-4xl font-bold text-[#0f1a0f] leading-tight">{post.title}</h1>
               {post.published_at && (
                 <p className="text-sm text-gray-600">Published {formatDate(post.published_at)}</p>
               )}
               <div className="flex flex-wrap gap-2 text-sm text-gray-600">
-                <span className="px-3 py-1 rounded-full bg-[#e7efe1] border border-gray-200">
-                  {post.slug}
-                </span>
+                <span className="px-3 py-1 rounded-full bg-[#e7efe1] border border-gray-200">{post.slug}</span>
               </div>
             </div>
 
@@ -144,13 +138,11 @@ export default function ArticleDetailPage() {
 
         <aside className="space-y-6">
           <div className="glass-panel p-4 space-y-3">
-            <h3 className="text-lg font-semibold text-[#0f1a0f] border-b border-gray-200 pb-2">
-              Recent Posts
-            </h3>
+            <h3 className="text-lg font-semibold text-[#0f1a0f] border-b border-gray-200 pb-2">Recent Posts</h3>
             <ul className="space-y-2 text-sm text-gray-800">
               {recentPosts.map((item) => (
                 <li key={item.id} className="flex items-start gap-2">
-                  <span className="mt-1 text-[#0f1a0f]">•</span>
+                  <span className="mt-1 text-[#0f1a0f]">-</span>
                   <Link to={`/articles/${item.slug}`} className="hover:text-[#2fb3d5] leading-snug">
                     {item.title}
                   </Link>
@@ -161,13 +153,11 @@ export default function ArticleDetailPage() {
           </div>
 
           <div className="glass-panel p-4 space-y-3">
-            <h3 className="text-lg font-semibold text-[#0f1a0f] border-b border-gray-200 pb-2">
-              Archives
-            </h3>
+            <h3 className="text-lg font-semibold text-[#0f1a0f] border-b border-gray-200 pb-2">Archives</h3>
             <ul className="space-y-2 text-sm text-gray-800">
               {archives.map((entry) => (
                 <li key={entry} className="flex items-center gap-2">
-                  <span className="text-[#0f1a0f]">•</span>
+                  <span className="text-[#0f1a0f]">-</span>
                   <span>{entry}</span>
                 </li>
               ))}

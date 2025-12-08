@@ -8,7 +8,7 @@ const Layout = () => (
       <Outlet />
     </main>
     <footer className="border-t border-white/40 bg-white/80 backdrop-blur text-center py-5 text-sm text-gray-700">
-      c {new Date().getFullYear()} Your Company Name. All rights reserved.
+      (c) {new Date().getFullYear()} Campbell Consulting Services of Tallahassee LLC (SDVOSB). All rights reserved.
     </footer>
   </div>
 );
