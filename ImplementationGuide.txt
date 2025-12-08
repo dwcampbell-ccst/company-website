@@ -1,0 +1,135 @@
+CCST Website Implementation Guide
+===============================
+
+Purpose
+- Translate the 5-page wireframe PDF into the existing React + Vite + Tailwind codebase with Supabase-backed CMS (pages/posts/contact_messages) and the Vercel-style contact API.
+- Deliver a modern, conversion-focused site: Home, Services, Articles, About, Contact, plus existing admin/blog infrastructure.
+
+Tech context (current repo)
+- Frontend: React 18, Vite, Tailwind, React Router (BrowserRouter). Entry: frontend/src/App.jsx with Layout + Header + routed pages.
+- CMS/data: Supabase tables pages (static page content), posts (articles/blog), contact_messages (form capture). Hook usePageContent(slug) already fetches pages.
+- Backend: api/contact.js (POST) writes contact_messages via service key and sends email via Nodemailer (env: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, SMTP_* , CONTACT_RECEIVER_EMAIL).
+- Styling: Tailwind + custom glass/pill classes in src/index.css. Background image and Manrope font.
+
+High-level build sequence
+1) Update layout/header/footer to match wireframe CTAs and nav labels.
+2) Rebuild Home page sections per wireframe.
+3) Rebuild Services page with 3 offerings + download CTAs.
+4) Rebuild Articles page hero + opt-in CTA; ensure posts list uses Supabase.
+5) Rebuild About page content blocks.
+6) Rebuild Contact page with form, contact info, topic checkboxes, and calendar widget placeholder.
+7) Seed Supabase pages/posts with the new copy; wire download CTAs (direct files or gated forms).
+8) QA (layout, responsiveness, forms, email/dB capture, routing).
+
+Navigation and CTA targets
+- Header links: Home (/), Services (/services), Articles (/articles), About (/about), Contact (/contact). Keep logo + tagline; add "Schedule a Consultation" button (links to /contact or calendly).
+- Primary CTAs: "Explore Our Services" -> /services, "Contact Us" -> /contact, "Schedule a Consultation" -> /contact#form, "View All Insights" -> /articles.
+- Secondary CTAs: download packs (link files or start gated download flow), "Book a Strategic Intro Call" -> external calendar link.
+
+Page-by-page implementation
+---------------------------
+Home (/)
+- Hero: Value prop "Clarity for Decisions. Structure for Delivery. Innovation for the Future." Subtext about SDVOSB + three specialties. Two buttons: Explore Our Services (primary), Contact Us (secondary).
+- What We Do (3 cards, equal width):
+  1) Strategic Decision Support - description + Learn More -> /services#strategic.
+  2) SLED Contracting Services - description + Learn More -> /services#sled.
+  3) Software Development & Intelligent Systems - description + Learn More -> /services#software.
+- Featured Insights (optional): 3 article cards if you want dynamism. Pull the 3 latest published posts from Supabase; otherwise hide.
+- Why Organizations Choose CCST: credibility block replacing old "scope/requirements/documentation". Bullets from PDF:
+  - Clear problem definition and structured decision support
+  - High-quality requirements and documentation
+  - End-to-end SDLC guidance for Agile and traditional environments
+  - Reliable modernization planning and execution
+  - Practical guidance rooted in real-world experience
+  Add short intro and CTA duo: Contact Us + Explore Our Services.
+- How We Work (4-step process): Initial Consultation, Assessment & Clarity, Roadmap & Recommendations, Execution & Support. Add CTA "Schedule a Consultation".
+- Footer: keep but update text to "(c) {year} Campbell Consulting Services of Tallahassee LLC (SDVOSB). All rights reserved."
+
+Services (/services)
+- Hero: Title "Services", subtitle per wireframe.
+- Three service sections with anchors (#strategic, #sled, #software). Use a data array to render cards/sections with consistent styling.
+- Strategic Decision Support:
+  - Hook: "Clarity for leaders. Alignment for teams. Execution for the organization."
+  - Copy: executive-level advisory combining BA/SE + AI tooling; for leaders needing decisions framed and executed.
+  - Included bullets: Fractional BASE Advisory; Executive Decision Support & Strategic Clarity Sessions; AI Prompt Engineering Training; DocuSign & Digital Workflow Optimization Classes; Process Modernization Mapping; Technology Evaluation & Buy-vs-Build Analysis; Organizational Alignment Workshops; Executive Document Reviews.
+  - Ideal For: leaders needing clarity/alignment/execution without large firms.
+  - Next Step CTA: "Download the Strategic Decision Clarity Pack" (gated download or direct file).
+- SLED Contracting Services:
+  - Hook: Trusted delivery for State, Local, Education, Federal.
+  - Core bullets: BA & Requirements Engineering; Application Modernization (Legacy -> Cloud); Data Strategy/Governance/Migrations; Cybersecurity & Blue-Team Advisory; Project Management & PMO Support; IV&V; Stakeholder Engagement; RFP/RFI Tech Writing & Proposal Support.
+  - Past performance (abbrev): FL Dept of Elder Affairs (D365/Power Platform, Azure transition); NY State ITS (BA & Data Management); multiple modernization/compliance/process engagements.
+  - Ideal For: agencies/prime contractors needing SDVOSB partner.
+  - Next Step CTA: "Download the SLED Solutions Brief".
+- Software Development & Intelligent Systems:
+  - Hook: Practical, scalable software built to solve real problems.
+  - Current/Emerging projects: VidSense (video renaming + metadata), ImageSense (image org + metadata), AI Agent Development (recruiting/marketing/research/ops), Project Liberty (distributed/ethical AI), Custom Software Solutions (BA/SE-led).
+  - Ideal For: organizations wanting AI tools/automation/early access.
+  - Next Step CTA: "Download the Automation Preview Pack".
+- Layout idea: top summary, then stacked sections with icon tags, and a CTA strip at bottom linking to Contact and scheduling.
+
+Articles (/articles and /articles/:slug)
+- Hero text: "Insights & Articles - Practical guidance, frameworks, and perspectives to support better decisions."
+- Optional opt-in CTA: "Join Our Insights List" (mailing list field) OR alternate CTA linking to services.
+- List: use Supabase posts (status=published), show hero image, title, excerpt, date. Keep recent/archives sidebar.
+- Detail page: render post.content (HTML) with hero image, publish date, and "Back to Articles" + "View Services" CTAs.
+
+About (/about)
+- Hero: "Strategic Insight. Systems Thinking. Practical Innovation."
+- Overview: CCST as SDVOSB (founded 2019, Tallahassee) specializing in BA, SE, IT strategy, digital transformation; supports gov/commercial tech teams; highlights compliance awareness (HIPAA, CMMC, state).
+- Mission: "To bring clarity, structure, and disciplined execution..."
+- Differentiators bullets:
+  - Full-Lifecycle Systems Thinking with clarity/alignment/traceability
+  - Expert Requirements Engineering and process definition
+  - Strategic IT Guidance reducing operational risk
+  - Reliable Change Management & Configuration Support
+  - (tie back to 3 service lines)
+- Leadership: Daniel Campbell - founder/principal BA/SE; SDV, 14 years Army/National Guard; 10+ years gov/commercial IT; focus on clarity/structure/mission-driven outcomes.
+- CTA: "Explore Our Services".
+
+Contact (/contact)
+- Intro: "Start the Conversation" and subtext from wireframe.
+- Contact info block: Email dan@consultcampbell.com, Phone 850-273-6646, Business name, Location Tallahassee, Florida. Add "Book a Strategic Intro Call" link.
+- Reasons to contact (bullets): SDVOSB, state/federal experience, clear/structured consulting.
+- Form fields: Name, Email, Phone (optional), Company, Topic/Service of Interest (checkboxes: Strategic Decision Support, SLED Contracting, Software Development, General Inquiry), Message, Submit. Map to backend as {name, email, subject/topic, message, phone/company in body text}.
+- Calendar widget: simple inline calendar placeholder (non-functional) or embed external scheduling widget if available.
+- Privacy note: "Your information is confidential and used only to respond."
+- Behavior: POST to /api/contact; on success show thank-you; on failure show error.
+
+Component and data architecture suggestions
+- Use a data-driven approach for services and home cards (arrays in src/pages or src/components/data/services.js).
+- Create reusable components: Hero (title, subtitle, CTA buttons), SectionHeader (eyebrow + title + description), Card grid (for What We Do), Steps (for 4-step process), CTA banner, DownloadCard.
+- Keep usePageContent for admin-editable rich text where useful (e.g., about body, services intro). For structured lists (services bullets), prefer code-level arrays to avoid inconsistent formatting.
+- Featured Insights: optional component that queries Supabase posts limit 3; hide if empty.
+
+Styling guidance
+- Maintain glass + soft gradient background but lighten hero overlays for readability. Consider accent colors: deep green (#0f1a0f) as base text, cyan/teal (#2fb3d5) for CTAs, warm neutral (#e7efe1) for pills.
+- Typography: continue Manrope; use tight uppercase tracking for labels; keep headings bold.
+- Spacing: generous vertical rhythm (py-16 desktop, py-10 mobile), rounded corners (xl), subtle borders (#0000000f).
+- Buttons: primary solid teal, secondary outlined dark text on light background. Ensure focus states.
+- Responsive: 1 column on mobile, 2-3 columns on desktop; ensure hero text readable with gradients.
+- Accessibility: semantic headings, aria-labels on buttons/inputs, form validation messages.
+
+Data/Content setup (Supabase)
+- Update pages table content for slugs: home, services, about, contact with the new hero titles/subtitles and any long-form copy you want editable.
+- Seed posts with at least 3 articles to power Featured Insights and Articles list (status=published, slug, title, excerpt, content, hero_image_url, published_at).
+- Confirm RLS policies already allow public read of published posts/pages.
+
+Backend/contact wiring
+- Ensure .env has SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, SMTP_HOST/PORT/USER/PASS, SMTP_FROM, CONTACT_RECEIVER_EMAIL.
+- Form submission: POST /api/contact with { name, email, subject, message } (add phone/company/topic inside message body if not altering handler). On success, add a Supabase insert row and send email.
+- For download CTAs, either link static files (public/downloads/...) or implement gated flow: form -> call /api/contact with subject "Clarity Pack request" then trigger file download.
+
+QA checklist
+- Navigation works on desktop/mobile; mobile menu toggles.
+- All CTAs route correctly; anchor links (#strategic etc.) align with IDs.
+- Home sections render without Supabase dependency (structure from code) and hide Featured Insights when no posts.
+- Articles list shows Supabase content; detail page renders HTML; empty states handled.
+- Contact form validates required fields; success + error states visible; record stored in contact_messages and email delivered.
+- Responsiveness verified at 320px, 768px, 1024px widths.
+- SEO: set per-route <title>/<meta description> using react-helmet or Vite plugin; ensure h1 per page and descriptive alt text.
+
+Suggested next actions
+- Implement section components and data arrays per above, replacing current legacy copy in Home/Services/About/Contact pages.
+- Add download assets or placeholders in public/downloads and wire CTAs.
+- Seed Supabase with the new page/post content; test contact flow end-to-end.
+- Polish visuals (imagery per section, iconography) and run full accessibility and responsive pass.

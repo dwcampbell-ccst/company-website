@@ -1,0 +1,61 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color: #12130f;
+  background-color: #f4f6f1;
+}
+
+body {
+  margin: 0;
+  font-family: "Manrope", "Segoe UI", system-ui, -apple-system, sans-serif;
+  line-height: 1.5;
+  background-color: #0f1a0f;
+  background-image: linear-gradient(180deg, rgba(10, 17, 12, 0.55), rgba(10, 17, 12, 0.4)),
+    url("/background.png");
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-attachment: fixed;
+  color: #1c1c1a;
+}
+
+a {
+  color: inherit;
+}
+
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4 {
+  color: #131312;
+}
+
+.glass-panel {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  box-shadow: 0 18px 50px -35px rgba(10, 20, 10, 0.35);
+  border-radius: 18px;
+  backdrop-filter: blur(6px);
+}
+
+.pill {
+  border-radius: 9999px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.fade-in {
+  animation: fadeIn 220ms ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
