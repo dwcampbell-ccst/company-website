@@ -5,12 +5,14 @@
   "type": "commonjs",
   "scripts": {
     "dev": "cd frontend && npm run dev",
+    "api:dev": "node api/dev-server.js",
     "build": "cd frontend && npm run build",
     "preview": "cd frontend && npm run preview",
     "db:apply": "node scripts/apply-schema.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.86.2",
+    "dotenv": "^16.4.5",
     "nodemailer": "^6.9.16",
     "pg": "^8.13.1"
   }

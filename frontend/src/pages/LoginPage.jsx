@@ -43,7 +43,7 @@ export default function LoginPage() {
         .from("profiles")
         .select("id, role")
         .eq("id", user.id)
-        .single();
+        .maybeSingle();
 
       if (!profile) {
         await supabase.from("profiles").upsert({

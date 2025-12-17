@@ -29,7 +29,7 @@ const RequireAdmin = ({ children }) => {
         .from("profiles")
         .select("role")
         .eq("id", session.user.id)
-        .single();
+        .maybeSingle();
 
       if (error || !profile) {
         // If profile is missing, create an admin profile so the user can proceed.

@@ -2,6 +2,20 @@ import { useState } from "react";
 import { usePageContent } from "../hooks/usePageContent";
 import { contactContent } from "../content/siteContent";
 
+const DOWNLOAD_FILE_PATH = "/downloads/ccst-brief.pdf";
+const HUBSPOT_MEETING_URL = (import.meta.env.VITE_HUBSPOT_MEETING_URL || "").trim();
+const HUBSPOT_MEETING_EMBED =
+  HUBSPOT_MEETING_URL &&
+  `${HUBSPOT_MEETING_URL}${HUBSPOT_MEETING_URL.includes("?") ? "&" : "?"}embed=true`;
+
+const topicToFilename = (topic) => {
+  const safe = (topic || "General Inquiry")
+    .trim()
+    .replace(/[^A-Za-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "") || "Download";
+  return `${safe}.pdf`;
+};
+
 export default function ContactPage() {
   const { page, loading, error } = usePageContent("contact");
   const [form, setForm] = useState({
@@ -14,6 +28,7 @@ export default function ContactPage() {
   });
   const [status, setStatus] = useState("");
   const [sending, setSending] = useState(false);
+  const [showMeetingModal, setShowMeetingModal] = useState(false);
 
   const toggleTopic = (topic) => {
     setForm((prev) => {
@@ -40,27 +55,40 @@ export default function ContactPage() {
     setSending(true);
     setStatus("");
 
-    const topicLine = Array.from(form.topics).join(", ");
+    const selectedTopics = Array.from(form.topics);
+    const primaryTopic = selectedTopics[0] || "General Inquiry";
+    const topicLine = selectedTopics.join(", ");
     const subject = `Contact: ${topicLine}`;
-    const body = [
-      form.message.trim(),
-      "",
-      `Topics: ${topicLine}`,
-      form.company ? `Company: ${form.company}` : null,
-      form.phone ? `Phone: ${form.phone}` : null,
-    ]
-      .filter(Boolean)
-      .join("\n");
+
+    const apiBase = (import.meta.env.VITE_CONTACT_API_URL || "").replace(/\/$/, "");
+    const endpoint = `${apiBase}/api/contact`;
+
+    const downloadFilename = topicToFilename(primaryTopic);
+    const downloadPath = `/downloads/${downloadFilename}`;
+
+    const triggerDownload = () => {
+      const link = document.createElement("a");
+      link.href = downloadPath;
+      link.download = downloadFilename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    };
 
     try {
-      const res = await fetch("/api/contact", {
+      const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: form.name,
           email: form.email,
+          company: form.company,
+          phone: form.phone,
+          topics: selectedTopics,
           subject,
-          message: body,
+          message: form.message.trim(),
+          downloadPath,
+          downloadFilename,
         }),
       });
 
@@ -68,7 +96,13 @@ export default function ContactPage() {
         throw new Error("Request failed");
       }
 
-      setStatus("Thank you! We will get back to you soon.");
+      const result = await res.json().catch(() => ({}));
+      setStatus(
+        result?.emailSent === false
+          ? "Thank you! Your message was received, but email delivery is not set up yet."
+          : "Thank you! We will get back to you soon."
+      );
+      triggerDownload();
       setForm({
         name: "",
         email: "",
@@ -81,6 +115,26 @@ export default function ContactPage() {
       setStatus("Something went wrong. Please try again.");
     } finally {
       setSending(false);
+    }
+  };
+
+  const handleScheduleClick = (event) => {
+    // If a HubSpot meeting URL is configured, open the modal embed.
+    if (HUBSPOT_MEETING_EMBED) {
+      event.preventDefault();
+      setShowMeetingModal(true);
+      return;
+    }
+
+    // Otherwise fall back to scrolling to the calendar section.
+    const fallbackLink = contactContent.contactInfo.scheduleHref || "#calendar";
+    const targetId = fallbackLink.split("#")[1];
+    if (targetId) {
+      event.preventDefault();
+      const el = document.getElementById(targetId);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
     }
   };
 
@@ -117,7 +171,8 @@ export default function ContactPage() {
               <li>Location: {contactContent.contactInfo.location}</li>
             </ul>
             <a
-              href={contactContent.contactInfo.scheduleHref}
+              href={HUBSPOT_MEETING_URL || contactContent.contactInfo.scheduleHref || "#calendar"}
+              onClick={handleScheduleClick}
               className="inline-flex items-center rounded-full bg-[#2fb3d5] px-4 py-2 text-sm font-semibold text-white hover:bg-[#2295b2] transition"
             >
               {contactContent.contactInfo.scheduleLabel}
@@ -241,12 +296,29 @@ export default function ContactPage() {
         </div>
       </div>
 
-      <div
-        id="calendar"
-        className="glass-panel p-6 md:p-8 text-center text-sm text-gray-700 border border-dashed border-gray-300"
-      >
-        Calendar placeholder: embed your scheduling tool here (Calendly or similar).
-      </div>
+      {showMeetingModal && HUBSPOT_MEETING_EMBED && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4">
+          <div className="relative w-full max-w-4xl bg-white rounded-xl shadow-2xl overflow-hidden">
+            <button
+              type="button"
+              aria-label="Close scheduler"
+              onClick={() => setShowMeetingModal(false)}
+              className="absolute top-3 right-3 h-9 w-9 rounded-full bg-white text-gray-700 border border-gray-200 shadow-sm hover:bg-gray-100"
+            >
+              ✕
+            </button>
+            <div className="p-4 border-b border-gray-100" aria-hidden="true" />
+            <div className="w-full" style={{ minHeight: "780px" }}>
+              <iframe
+                src={HUBSPOT_MEETING_EMBED}
+                title="Book a Strategic Intro Call"
+                style={{ width: "100%", minHeight: "780px", border: "none" }}
+                loading="lazy"
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

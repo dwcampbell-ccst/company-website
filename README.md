@@ -25,6 +25,8 @@ Create `frontend/.env` for client-side values:
 ```
 VITE_SUPABASE_URL=...
 VITE_SUPABASE_ANON_KEY=...
+# Optional: embed a HubSpot Meeting link on the Contact page
+VITE_HUBSPOT_MEETING_URL=https://meetings.hubspot.com/your-user/your-meeting
 ```
 
 Backend/serverless variables (set locally or in Vercel Project Settings):
@@ -39,6 +41,13 @@ SMTP_USER=...
 SMTP_PASS=...
 SMTP_FROM="Website Contact <no-reply@example.com>"
 CONTACT_RECEIVER_EMAIL=you@example.com
+HUBSPOT_PRIVATE_APP_TOKEN=...
+# Optional: set these only if you created matching custom Contact properties in HubSpot
+# Common internal names: service_of_interest, message_multi_line
+HUBSPOT_CONTACT_TOPICS_PROPERTY=...
+HUBSPOT_CONTACT_MESSAGE_PROPERTY=...
+HUBSPOT_CONTACT_SUBJECT_PROPERTY=...
+HUBSPOT_CONTACT_DOWNLOAD_PROPERTY=...
 ```
 
 ## Install & run locally
@@ -47,7 +56,11 @@ CONTACT_RECEIVER_EMAIL=you@example.com
 cd company-website
 npm install          # installs root + API deps
 cd frontend && npm install
-npm run dev          # from repo root; proxies to frontend dev server
+cd ..
+# Terminal 1: start the contact API locally (uses .env at repo root)
+npm run api:dev
+# Terminal 2: start the Vite frontend (proxies /api to http://localhost:8788)
+npm run dev
 ```
 
 Build the production bundle:
@@ -83,4 +96,4 @@ This creates `profiles`, `posts`, `pages`, and `contact_messages`, enables RLS, 
 
 ## Contact form
 
-The frontend posts to `/api/contact`, which stores the message in `contact_messages` (using the Supabase service role key) and sends an email via SMTP. Configure SMTP env vars for delivery.
+The frontend posts to `/api/contact`, which stores the message in `contact_messages` (using the Supabase service role key) and sends an email via SMTP. If `HUBSPOT_PRIVATE_APP_TOKEN` is set, the same submission is also synced to HubSpot as a Contact (email/name/company/phone) and can optionally populate custom HubSpot properties for topics/message/download details. On successful submission the user is prompted to download the PDF at `frontend/public/downloads/ccst-brief.pdf`.

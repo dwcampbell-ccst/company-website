@@ -35,10 +35,27 @@ create table if not exists public.contact_messages (
   id bigserial primary key,
   name text,
   email text,
+  company text,
+  phone text,
+  topics text[],
   subject text,
   message text,
+  download_path text,
+  download_filename text,
+  hubspot_contact_id text,
+  hubspot_synced_at timestamp with time zone,
+  hubspot_error text,
   created_at timestamp with time zone default now()
 );
+
+alter table public.contact_messages add column if not exists company text;
+alter table public.contact_messages add column if not exists phone text;
+alter table public.contact_messages add column if not exists topics text[];
+alter table public.contact_messages add column if not exists download_path text;
+alter table public.contact_messages add column if not exists download_filename text;
+alter table public.contact_messages add column if not exists hubspot_contact_id text;
+alter table public.contact_messages add column if not exists hubspot_synced_at timestamp with time zone;
+alter table public.contact_messages add column if not exists hubspot_error text;
 
 -- Track updated_at on updates
 create or replace function public.set_updated_at()
@@ -64,6 +81,24 @@ execute procedure public.set_updated_at();
 alter table public.posts enable row level security;
 alter table public.pages enable row level security;
 alter table public.contact_messages enable row level security;
+alter table public.profiles enable row level security;
+
+-- Profiles policies
+drop policy if exists "Users can read their profile" on public.profiles;
+create policy "Users can read their profile"
+  on public.profiles for select
+  using (auth.uid() = id);
+
+drop policy if exists "Users can insert their profile" on public.profiles;
+create policy "Users can insert their profile"
+  on public.profiles for insert
+  with check (auth.uid() = id);
+
+drop policy if exists "Users can update their profile" on public.profiles;
+create policy "Users can update their profile"
+  on public.profiles for update
+  using (auth.uid() = id)
+  with check (auth.uid() = id);
 
 -- Posts policies
 drop policy if exists "Public can read published posts" on public.posts;
