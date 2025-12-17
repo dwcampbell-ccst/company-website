@@ -42,7 +42,7 @@ export default function ServicesPage() {
               </p>
               <span className="text-xs text-gray-600">#{service.id}</span>
             </div>
-            <h2 className="text-2xl md:text-3xl font-bold text-[#0f1a0f]">{service.hook}</h2>
+            <h2 className="text-lg md:text-xl font-bold text-[#0f1a0f]">{service.hook}</h2>
             <p className="text-gray-700 text-base">{service.description}</p>
 
             <div className="grid gap-4 md:grid-cols-[1.2fr_0.8fr] items-start">

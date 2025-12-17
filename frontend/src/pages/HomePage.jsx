@@ -1,6 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { supabase } from "../lib/supabaseClient";
 import {
   homeHero,
   whatWeDoCards,
@@ -12,36 +10,9 @@ import {
 } from "../content/siteContent";
 
 export default function HomePage() {
-  const [posts, setPosts] = useState([]);
-
-  useEffect(() => {
-    const load = async () => {
-      const { data, error } = await supabase
-        .from("posts")
-        .select("id, title, slug, excerpt, published_at, hero_image_url")
-        .eq("status", "published")
-        .order("published_at", { ascending: false })
-        .limit(3);
-
-      if (!error) {
-        setPosts(data || []);
-      }
-    };
-
-    load();
-  }, []);
-
-  const showFeaturedInsights = useMemo(() => posts.length > 0, [posts.length]);
-
-  const formatDate = (date) =>
-    date ? new Date(date).toLocaleDateString(undefined, { month: "long", day: "numeric", year: "numeric" }) : "";
-
-  const placeholderImg =
-    "https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?auto=format&fit=crop&w=900&q=80";
-
   return (
     <div className="max-w-6xl mx-auto px-4 py-10 md:py-14 space-y-8">
-      <section className="glass-panel p-6 md:p-8 fade-in">
+      <section className="glass-panel p-6 md:p-8 fade-in space-y-6">
         <div className="relative overflow-hidden rounded-2xl border border-white/50 shadow-sm min-h-[420px]">
           <img
             src="/homePage.webp"
@@ -50,30 +21,27 @@ export default function HomePage() {
             loading="lazy"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-black/35 via-black/10 to-transparent" />
-          <div className="relative z-10 flex items-end md:items-center min-h-[420px] p-4 md:p-8">
-            <div className="glass-panel bg-white/90 p-6 md:p-8 max-w-2xl space-y-4">
-              <p className="pill inline-flex bg-[#e7efe1] px-3 py-1 text-xs uppercase tracking-[0.18em] text-[#0f1a0f]">
-                {homeHero.title}
-              </p>
-              <h1 className="text-3xl md:text-5xl font-bold leading-snug text-[#0f1a0f]">
-                {homeHero.tagline}
-              </h1>
-              <p className="text-gray-700 text-base md:text-lg">{homeHero.description}</p>
-              <div className="flex flex-wrap gap-3 pt-1">
-                <Link
-                  to={homeHero.primaryCta.to}
-                  className="inline-flex items-center rounded-full bg-[#2fb3d5] px-5 py-2.5 text-sm md:text-base font-semibold text-white shadow-sm hover:bg-[#2295b2] transition"
-                >
-                  {homeHero.primaryCta.label}
-                </Link>
-                <Link
-                  to={homeHero.secondaryCta.to}
-                  className="inline-flex items-center rounded-full border border-[#0f1a0f] bg-white/50 px-5 py-2.5 text-sm md:text-base font-semibold text-[#0f1a0f] hover:bg-[#0f1a0f] hover:text-white transition"
-                >
-                  {homeHero.secondaryCta.label}
-                </Link>
-              </div>
-            </div>
+        </div>
+
+        <div className="glass-panel bg-white/90 p-6 md:p-8 w-full space-y-4">
+          <p className="pill inline-flex bg-[#e7efe1] px-3 py-1 text-xs uppercase tracking-[0.18em] text-[#0f1a0f]">
+            {homeHero.title}
+          </p>
+          <h1 className="text-3xl md:text-5xl font-bold leading-snug text-[#0f1a0f]">{homeHero.tagline}</h1>
+          <p className="text-gray-700 text-base md:text-lg">{homeHero.description}</p>
+          <div className="flex flex-wrap gap-3 pt-1">
+            <Link
+              to={homeHero.primaryCta.to}
+              className="inline-flex items-center rounded-full bg-[#2fb3d5] px-5 py-2.5 text-sm md:text-base font-semibold text-white shadow-sm hover:bg-[#2295b2] transition"
+            >
+              {homeHero.primaryCta.label}
+            </Link>
+            <Link
+              to={homeHero.secondaryCta.to}
+              className="inline-flex items-center rounded-full border border-[#0f1a0f] bg-white/50 px-5 py-2.5 text-sm md:text-base font-semibold text-[#0f1a0f] hover:bg-[#0f1a0f] hover:text-white transition"
+            >
+              {homeHero.secondaryCta.label}
+            </Link>
           </div>
         </div>
       </section>
@@ -83,7 +51,7 @@ export default function HomePage() {
           <p className="pill inline-flex bg-white/80 px-3 py-1 text-xs uppercase tracking-[0.18em] text-gray-700 w-fit">
             What We Do
           </p>
-          <h2 className="text-2xl md:text-3xl font-bold text-[#0f1a0f]">Three service lines</h2>
+          <h2 className="text-lg md:text-xl font-bold text-[#0f1a0f]">Three service lines</h2>
           <p className="text-gray-700 max-w-3xl">
             Strategic clarity, contracting delivery, and practical software to turn ideas into measurable outcomes.
           </p>
@@ -102,53 +70,12 @@ export default function HomePage() {
         </div>
       </section>
 
-      {showFeaturedInsights ? (
-        <section className="glass-panel p-6 md:p-8 space-y-6 fade-in">
-          <div className="flex flex-col gap-2">
-            <p className="pill inline-flex bg-white/80 px-3 py-1 text-xs uppercase tracking-[0.18em] text-gray-700 w-fit">
-              Featured Insights
-            </p>
-            <h2 className="text-2xl font-bold text-[#0f1a0f]">Latest perspectives</h2>
-            <p className="text-gray-700">Evergreen guidance to support better decisions.</p>
-          </div>
-          <div className="grid gap-5 md:grid-cols-3">
-            {posts.map((post) => (
-              <article key={post.id} className="glass-panel border border-gray-100 shadow-sm p-4 space-y-3">
-                <Link to={`/articles/${post.slug}`} className="block overflow-hidden rounded-md border border-gray-200">
-                  <img
-                    src={post.hero_image_url || placeholderImg}
-                    alt={post.title}
-                    className="w-full h-44 object-cover"
-                    loading="lazy"
-                  />
-                </Link>
-                <div className="space-y-2">
-                  <h3 className="text-lg font-semibold text-[#0f1a0f] leading-snug">
-                    <Link to={`/articles/${post.slug}`} className="hover:text-[#2fb3d5]">
-                      {post.title}
-                    </Link>
-                  </h3>
-                  {post.excerpt ? <p className="text-sm text-gray-700">{post.excerpt}</p> : null}
-                </div>
-                <p className="text-xs text-gray-600">{formatDate(post.published_at)}</p>
-              </article>
-            ))}
-          </div>
-          <Link
-            to="/articles"
-            className="inline-flex w-fit items-center rounded-full bg-[#0f1a0f] px-4 py-2 text-sm font-semibold text-white hover:bg-black transition"
-          >
-            View All Insights
-          </Link>
-        </section>
-      ) : null}
-
       <section className="glass-panel p-6 md:p-8 grid gap-8 md:grid-cols-[1.2fr_0.8fr] items-start fade-in">
         <div className="space-y-4">
           <p className="pill inline-flex bg-white/80 px-3 py-1 text-xs uppercase tracking-[0.18em] text-gray-700 w-fit">
             Why Organizations Choose CCST
           </p>
-          <h2 className="text-2xl md:text-3xl font-bold text-[#0f1a0f]">{whyChooseContent.heading}</h2>
+          <h2 className="text-lg md:text-xl font-bold text-[#0f1a0f]">{whyChooseContent.heading}</h2>
           <p className="text-gray-700">{whyChooseContent.description}</p>
           <p className="text-sm font-semibold text-[#0f1a0f]">{whyChooseContent.preface}</p>
           <ul className="space-y-2 text-sm text-gray-800">
@@ -186,7 +113,7 @@ export default function HomePage() {
           <p className="pill inline-flex bg-white/80 px-3 py-1 text-xs uppercase tracking-[0.18em] text-gray-700 w-fit">
             How We Work
           </p>
-          <h2 className="text-2xl md:text-3xl font-bold text-[#0f1a0f]">Simple 4-step process</h2>
+          <h2 className="text-lg md:text-xl font-bold text-[#0f1a0f]">Simple 4-step process</h2>
           <p className="text-gray-700 max-w-3xl">{howWeWorkIntro}</p>
         </div>
         <div className="grid gap-4 md:grid-cols-4">

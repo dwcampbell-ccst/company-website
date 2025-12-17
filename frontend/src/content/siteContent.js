@@ -155,30 +155,41 @@ export const articlesHero = {
 };
 
 export const aboutContent = {
+  eyebrow: "About Campbell Consulting Services of Tallahassee (CCST)",
   heroTitle: "Strategic Insight. Systems Thinking. Practical Innovation.",
-  heroSubtitle:
-    "CCST is a SDVOSB providing BA, SE, IT strategy, and modern digital transformation for government and commercial clients.",
   overview: [
-    "Founded in 2019 and headquartered in Tallahassee, Florida, CCST supports agencies and technology teams seeking clarity, structure, and dependable execution across their most important initiatives.",
-    "We combine full life cycle systems thinking with practical consulting to modernize operations, align technology investments with strategic goals, and deliver lasting outcomes, including compliance awareness (HIPAA, CMMC, and state requirements).",
+    "Campbell Consulting Services of Tallahassee LLC (CCST) is a Service-Disabled Veteran-Owned Small Business (SDVOSB) specializing in Business Analysis, Systems Engineering, IT Strategy, and modern digital transformation. Founded in 2019 and headquartered in Tallahassee, Florida, CCST supports government agencies, commercial organizations, and technology teams seeking clarity, structure, and dependable execution across their most important initiatives.",
+    "We combine full life cycle systems thinking with practical, real-world consulting to help organizations modernize operations, align technology investments with strategic goals, and deliver lasting outcomes. Our capabilities span IT strategy development, requirements engineering, stakeholder engagement, agile delivery, cybersecurity support, data initiatives, and full SDLC project execution. Whether guiding a modernization effort, supporting a state or federal program, or building intelligent software solutions, CCST brings disciplined processes and a client-centered approach to every engagement.",
+    "As a trusted partner in both the public and private sectors, we pride ourselves on measurable results, transparency, and sustained impact. Our work is grounded in rigorous analysis, well-defined processes, and a deep understanding of regulatory and operational environments—including HIPAA, CMMC, and state-level compliance requirements.",
   ],
+  missionHeading: "Our Mission",
   mission:
-    "To bring clarity, structure, and disciplined execution to every initiative we support, turning complexity into actionable insight and sustainable outcomes.",
+    "To bring clarity, structure, and disciplined execution to every initiative we support—transforming complexity into actionable insight and enabling strong, sustainable outcomes for our clients.",
+  differentiatorsHeading: "Our Differentiators",
+  differentiatorsIntro:
+    "CCST’s strength comes from our commitment to structured execution and systems thinking:",
   differentiators: [
-    "Full-lifecycle systems thinking for clarity, alignment, and traceability",
-    "Expert requirements engineering and process definition",
-    "Strategic IT guidance that reduces operational risk",
-    "Reliable change management and configuration support",
+    "Full-Lifecycle Systems Thinking that ensures initiatives are grounded in clarity, alignment, and traceability.",
+    "Expert Requirements Engineering and process definition that reduce ambiguity and accelerate delivery.",
+    "Strategic IT Guidance that helps leaders make informed decisions and reduce operational risk.",
+    "Reliable Change Management & Configuration Support that minimizes downtime and improves long-term stability.",
   ],
+  differentiatorsOutro:
+    "Across every service line—Strategic Decision Support, SLED Contracting, and Software Development—our mission remains the same: to help organizations transform complexity into actionable insight and position themselves for long-term success.",
+  leadershipHeading: "Leadership",
   leadership: {
     name: "Daniel Campbell",
-    title: "Founder and Principal BA/SE",
+    title: "Founder & Principal Business Analyst / Systems Engineer",
     summary: [
-      "Service-disabled veteran with 14 years Army/National Guard",
+      "Service-Disabled Veteran, 14 years Army/National Guard",
       "10+ years supporting government and commercial IT initiatives",
-      "Focus on clarity, structure, and mission-driven client outcomes",
+      "Focused on clarity, structure, and mission-driven client outcomes",
     ],
   },
+  nextStepHeading: "Next Step",
+  nextStepText:
+    "Learn more about how CCST supports organizations with Strategic Decision Support, SLED Contracting Services, and Software Development.",
+  nextStepCta: { label: "Explore Our Services", to: "/services" },
 };
 
 export const contactContent = {
