@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { usePageContent } from "../hooks/usePageContent";
 import { contactContent } from "../content/siteContent";
 
-const DOWNLOAD_FILE_PATH = "/downloads/ccst-brief.pdf";
 const HUBSPOT_MEETING_URL = (import.meta.env.VITE_HUBSPOT_MEETING_URL || "").trim();
 const HUBSPOT_MEETING_EMBED =
   HUBSPOT_MEETING_URL &&
@@ -18,6 +18,7 @@ const topicToFilename = (topic) => {
 
 export default function ContactPage() {
   const { page, loading, error } = usePageContent("contact");
+  const [searchParams] = useSearchParams();
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -29,6 +30,28 @@ export default function ContactPage() {
   const [status, setStatus] = useState("");
   const [sending, setSending] = useState(false);
   const [showMeetingModal, setShowMeetingModal] = useState(false);
+
+  useEffect(() => {
+    const rawTopic = (searchParams.get("topic") || "").trim();
+    if (!rawTopic) return;
+
+    const aliasMap = {
+      "strategic decision support": "Strategic Decision Support",
+      "sled contracting": "SLED Contracting",
+      "sled contracting services": "SLED Contracting",
+      "software development": "Software Development",
+      "software and automation": "Software Development",
+      "software & automation": "Software Development",
+      "general inquiry": "General Inquiry",
+    };
+
+    const normalized = rawTopic.toLowerCase();
+    const desired = aliasMap[normalized] || rawTopic;
+    const allowed = new Set(contactContent.topics);
+    const selected = allowed.has(desired) ? desired : "General Inquiry";
+
+    setForm((prev) => ({ ...prev, topics: new Set([selected]) }));
+  }, [searchParams]);
 
   const toggleTopic = (topic) => {
     setForm((prev) => {
