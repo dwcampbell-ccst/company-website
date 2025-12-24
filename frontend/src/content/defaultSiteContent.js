@@ -1,0 +1,215 @@
+export const DEFAULT_SITE_CONTENT = {
+  global: {
+    "header.logoAlt": "Company Logo",
+    "header.taglineLine1": "Business Analysis and Systems Engineering",
+    "header.taglineLine2": "Done Right",
+    "header.nav.home": "Home",
+    "header.nav.services": "Services",
+    "header.nav.articles": "Articles",
+    "header.nav.about": "About",
+    "header.nav.contact": "Contact Us",
+    "header.navCtaLabel": "Schedule a Consultation",
+    "header.mobile.openLabel": "Menu",
+    "header.mobile.closeLabel": "Close",
+    "footer.sdvLogoAlt": "Service-Disabled Veteran-Owned Small Business (SDVOSB)",
+    "footer.sdvLabel": "SDVOSB",
+    "footer.companyName": "Campbell Consulting Services of Tallahassee LLC (CCST)",
+    "footer.line1": "Service-Disabled Veteran-Owned Small Business (SDVOSB) • Founded 2019",
+    "footer.line2": "Supporting Florida DOEA, NYS ITS, and commercial organizations",
+    "footer.line3": "Experienced in HIPAA, CMMC, and state-level compliance environment",
+    "footer.copyrightSuffix":
+      "Campbell Consulting Services of Tallahassee LLC. All rights reserved.",
+  },
+  home: {
+    "hero.imageAlt": "Campbell Consulting homepage hero",
+    "hero.pill": "Campbell Consulting Services of Tallahassee (CCST)",
+    "hero.tagline": "Clarity for Decisions. Structure for Delivery. Innovation for the Future.",
+    "hero.description":
+      "CCST is a Service-Disabled Veteran-Owned Small Business (SDVOSB) specializing in Strategic Decision Support, SLED Contracting Services, and Intelligent Software Development. We help leaders and organizations move from uncertainty to clarity, from complexity to structure, and from ideas to measurable outcomes.",
+    "hero.primaryCtaLabel": "Explore Our Services",
+    "hero.secondaryCtaLabel": "Contact Us",
+    "whatWeDo.eyebrow": "What We Do",
+    "whatWeDo.heading": "Three service lines",
+    "whatWeDo.description":
+      "Strategic clarity, contracting delivery, and practical software to turn ideas into measurable outcomes.",
+    "whatWeDo.learnMoreLabel": "Learn more",
+    "whatWeDo.cards.strategic.title": "Strategic Decision Support",
+    "whatWeDo.cards.strategic.hook":
+      "Clarity for leaders. Alignment for teams. Execution for the organization.",
+    "whatWeDo.cards.strategic.description":
+      "We support executives and founders with structured analysis, strategic advisory, training, and decision frameworks that accelerate progress and reduce risk.",
+    "whatWeDo.cards.sled.title": "SLED Contracting Services",
+    "whatWeDo.cards.sled.hook":
+      "Trusted delivery for State, Local, Education, and Federal partners.",
+    "whatWeDo.cards.sled.description":
+      "We provide Business Analysis, Systems Engineering, modernization support, and SDLC expertise to public-sector clients and prime contractors seeking reliable, structured execution.",
+    "whatWeDo.cards.software.title": "Software Development & Intelligent Systems",
+    "whatWeDo.cards.software.hook": "Practical, scalable software built to solve real problems.",
+    "whatWeDo.cards.software.description":
+      "From AI agents to intelligent automation tools like VidSense, we create solutions that increase efficiency, reduce manual burden, and support better decision-making.",
+    "whyChoose.eyebrow": "Why Organizations Choose CCST",
+    "whyChoose.heading": "A disciplined approach grounded in Systems Thinking.",
+    "whyChoose.description":
+      "We bring structure, clarity, and full lifecycle expertise to every engagement - ensuring that technology initiatives align with organizational goals and deliver measurable results.",
+    "whyChoose.preface": "Our clients rely on us for:",
+    "whyChoose.bullets":
+      "Clear problem definition and structured decision support\nHigh-quality requirements and documentation\nEnd-to-end SDLC guidance for Agile and traditional environments\nReliable modernization planning and execution\nPractical guidance rooted in real-world experience",
+    "readyCta.title": "Ready to strengthen your next initiative?",
+    "readyCta.description":
+      "Whether you need strategic clarity, government contracting support, or intelligent automation tools, CCST is here to help.",
+    "readyCta.primaryCtaLabel": "Contact Us",
+    "readyCta.secondaryCtaLabel": "Explore Our Services",
+    "howWeWork.eyebrow": "How We Work",
+    "howWeWork.heading": "Simple 4-step process",
+    "howWeWork.stepLabel": "Step",
+    "howWeWork.intro":
+      "A modern homepage should show the path - it reduces uncertainty and increases conversions.",
+    "howWeWork.steps.1.title": "Initial Consultation",
+    "howWeWork.steps.1.text": "We discuss your objectives, challenges, and desired outcomes.",
+    "howWeWork.steps.2.title": "Assessment & Clarity",
+    "howWeWork.steps.2.text":
+      "We analyze your environment, identify gaps, and provide structured insight.",
+    "howWeWork.steps.3.title": "Roadmap & Recommendations",
+    "howWeWork.steps.3.text": "You receive a clear, actionable plan aligned with your goals.",
+    "howWeWork.steps.4.title": "Execution & Support",
+    "howWeWork.steps.4.text": "We partner with your team to deliver measurable, predictable results.",
+    "howWeWork.bottomPrimaryCtaLabel": "Schedule a Consultation",
+    "howWeWork.bottomSecondaryCtaLabel": "View All Insights",
+  },
+  services: {
+    "page.eyebrow": "Services",
+    "serviceCard.whatIncludedHeading": "What is included",
+    "serviceCard.idealForHeading": "Ideal for",
+    "serviceCard.pastPerformanceHeading": "Representative past performance",
+    "serviceCard.secondaryCtaLabel": "Talk to an expert",
+    "sections.strategic.title": "Strategic Decision Support",
+    "sections.strategic.hook":
+      "Clarity for leaders. Alignment for teams. Execution for the organization.",
+    "sections.strategic.description":
+      "Executive-level insight without the overhead of a traditional consulting firm. We frame decisions, interpret complex information, and move initiatives from concept to execution.",
+    "sections.strategic.bullets":
+      "Fractional BASE Advisory (Business Analysis, Architecture, Systems Engineering)\nExecutive Decision Support and Strategic Clarity Sessions\nAI Prompt Engineering Training (team or department-level)\nDocuSign and digital workflow optimization classes\nProcess modernization mapping\nTechnology evaluation and buy-vs-build analysis\nOrganizational alignment workshops (Vision -> Strategy -> Execution)\nExecutive document reviews (business cases, proposals, roadmaps)",
+    "sections.strategic.idealFor":
+      "Leaders who need clarity, alignment, and execution support without hiring full-time executives or large consulting firms.",
+    "sections.strategic.ctaLabel": "Download the Strategic Decision Clarity Pack",
+    "sections.sled.title": "SLED Contracting Services",
+    "sections.sled.hook":
+      "Trusted delivery for State, Local, Education, and Federal partners.",
+    "sections.sled.description":
+      "SDVOSB specializing in BA/SE, modernization, data, and cybersecurity in government environments. Proven methods for requirements, data, modernization strategy, and contract execution.",
+    "sections.sled.bullets":
+      "Business analysis and requirements engineering\nApplication modernization (Legacy -> Cloud)\nData strategy, governance, and migration support\nCybersecurity and blue-team advisory\nProject management and PMO support\nIndependent verification and validation (IV&V)\nStakeholder engagement and facilitation\nRFP/RFI technical writing and proposal support",
+    "sections.sled.pastPerformance":
+      "Florida Department of Elder Affairs: application modernization (D365/Power Platform, Azure transition)\nNY State ITS: business analysis and data management support\nMultiple modernization, compliance, and process alignment engagements",
+    "sections.sled.idealFor":
+      "Agencies and prime contractors needing a reliable SDVOSB partner for disciplined delivery.",
+    "sections.sled.ctaLabel": "Download the SLED Solutions Brief",
+    "sections.software.title": "Software Development and Intelligent Systems",
+    "sections.software.hook": "Practical, scalable software built to solve real problems.",
+    "sections.software.description":
+      "Modern AI-enabled tools to streamline operations, automate workflows, and deliver actionable insights. Purpose-built solutions with low overhead and high value.",
+    "sections.software.bullets":
+      "VidSense: automated video renaming and metadata extraction\nImageSense: intelligent image organization and metadata structuring\nAI agent development for recruiting, marketing, research, and operations\nProject Liberty: R&D into distributed and ethical AI frameworks\nCustom software solutions built with BA/SE methodologies",
+    "sections.software.idealFor":
+      "Organizations wanting AI tools, workflow automation, or early access to emerging tech.",
+    "sections.software.ctaLabel": "Download the Automation Preview Pack",
+    "bottom.title": "Need to move from idea to execution?",
+    "bottom.description": "Start with a consultation and leave with a clear, actionable plan.",
+    "bottom.primaryCtaLabel": "Schedule a Consultation",
+    "bottom.secondaryCtaLabel": "View Insights",
+  },
+  about: {
+    "page.eyebrow": "About Campbell Consulting Services of Tallahassee (CCST)",
+    "page.heroTitle": "Strategic Insight. Systems Thinking. Practical Innovation.",
+    "page.overview":
+      "Campbell Consulting Services of Tallahassee LLC (CCST) is a Service-Disabled Veteran-Owned Small Business (SDVOSB) specializing in Business Analysis, Systems Engineering, IT Strategy, and modern digital transformation. Founded in 2019 and headquartered in Tallahassee, Florida, CCST supports government agencies, commercial organizations, and technology teams seeking clarity, structure, and dependable execution across their most important initiatives.\n\nWe combine full life cycle systems thinking with practical, real-world consulting to help organizations modernize operations, align technology investments with strategic goals, and deliver lasting outcomes. Our capabilities span IT strategy development, requirements engineering, stakeholder engagement, agile delivery, cybersecurity support, data initiatives, and full SDLC project execution. Whether guiding a modernization effort, supporting a state or federal program, or building intelligent software solutions, CCST brings disciplined processes and a client-centered approach to every engagement.\n\nAs a trusted partner in both the public and private sectors, we pride ourselves on measurable results, transparency, and sustained impact. Our work is grounded in rigorous analysis, well-defined processes, and a deep understanding of regulatory and operational environments-including HIPAA, CMMC, and state-level compliance requirements.",
+    "mission.heading": "Our Mission",
+    "mission.text":
+      "To bring clarity, structure, and disciplined execution to every initiative we support-transforming complexity into actionable insight and enabling strong, sustainable outcomes for our clients.",
+    "differentiators.heading": "Our Differentiators",
+    "differentiators.intro":
+      "CCST's strength comes from our commitment to structured execution and systems thinking:",
+    "differentiators.list":
+      "Full-Lifecycle Systems Thinking that ensures initiatives are grounded in clarity, alignment, and traceability.\nExpert Requirements Engineering and process definition that reduce ambiguity and accelerate delivery.\nStrategic IT Guidance that helps leaders make informed decisions and reduce operational risk.\nReliable Change Management & Configuration Support that minimizes downtime and improves long-term stability.",
+    "differentiators.outro":
+      "Across every service line-Strategic Decision Support, SLED Contracting, and Software Development-our mission remains the same: to help organizations transform complexity into actionable insight and position themselves for long-term success.",
+    "leadership.heading": "Leadership",
+    "leadership.name": "Daniel Campbell",
+    "leadership.title": "Founder & Principal Business Analyst / Systems Engineer",
+    "leadership.summary":
+      "Service-Disabled Veteran, 14 years Army/National Guard\n10+ years supporting government and commercial IT initiatives\nFocused on clarity, structure, and mission-driven client outcomes",
+    "nextStep.heading": "Next Step",
+    "nextStep.text":
+      "Learn more about how CCST supports organizations with Strategic Decision Support, SLED Contracting Services, and Software Development.",
+    "nextStep.ctaLabel": "Explore Our Services",
+  },
+  contact: {
+    "page.eyebrow": "Contact",
+    "page.introTitle": "Start the Conversation",
+    "page.introSubtitle":
+      "Exploring a new initiative or looking for a trusted partner? Reach out and we will follow up quickly.",
+    "contactInfo.heading": "Contact Information",
+    "contactInfo.emailLabel": "Email",
+    "contactInfo.phoneLabel": "Phone",
+    "contactInfo.businessLabel": "Business",
+    "contactInfo.locationLabel": "Location",
+    "contactInfo.email": "dan@consultcampbell.com",
+    "contactInfo.phone": "850-273-6646",
+    "contactInfo.business": "Campbell Consulting Services of Tallahassee LLC",
+    "contactInfo.location": "Tallahassee, Florida",
+    "contactInfo.scheduleLabel": "Book a Strategic Intro Call",
+    "reasons.heading": "Why organizations contact CCST",
+    "reasons.list":
+      "Service-Disabled Veteran-Owned Small Business (SDVOSB)\nProven experience supporting state and federal agencies\nClear, structured consulting grounded in systems thinking",
+    topics:
+      "Strategic Decision Support\nSLED Contracting\nSoftware Development\nGeneral Inquiry",
+    "form.heading": "Send us a message",
+    "form.labels.name": "Name",
+    "form.labels.email": "Email",
+    "form.labels.company": "Company",
+    "form.labels.phone": "Phone (optional)",
+    "form.labels.topic": "Topic / Service of Interest",
+    "form.labels.message": "Message",
+    "form.submitLabel": "Submit",
+    "form.sendingLabel": "Sending...",
+    "form.status.success": "Thank you! We will get back to you soon.",
+    "form.status.successNoEmail":
+      "Thank you! Your message was received, but email delivery is not set up yet.",
+    "form.status.error": "Something went wrong. Please try again.",
+    "form.privacyNote": "Your information is confidential and used only to respond.",
+    "scheduler.modalTitle": "Book a Strategic Intro Call",
+    "scheduler.closeLabel": "Close scheduler",
+  },
+  articles: {
+    "page.eyebrow": "Articles",
+    "hero.title": "Insights and Articles",
+    "hero.subtitle":
+      "Practical guidance, frameworks, and perspectives to support better decisions.",
+    "hero.optInText": "Join our insights list for occasional updates and tools.",
+    "hero.secondaryCtaLabel": "View Our Services",
+    "list.loading": "Loading articles...",
+    "list.empty": "No published posts yet. Create one in the admin area.",
+    "sidebar.recentHeading": "Recent Posts",
+    "sidebar.noPostsYet": "No posts yet.",
+    "sidebar.archivesHeading": "Archives",
+    "sidebar.noArchivesYet": "No archives yet.",
+  },
+  article_detail: {
+    loading: "Loading article...",
+    errorPrefix: "Failed to load article:",
+    "breadcrumbs.home": "Home",
+    "breadcrumbs.articles": "Articles",
+    publishedPrefix: "Published",
+    shareButtonLabel: "Share this article",
+    "sidebar.recentHeading": "Recent Posts",
+    "sidebar.noPostsYet": "No posts yet.",
+    "sidebar.archivesHeading": "Archives",
+    "sidebar.noArchivesYet": "No archives yet.",
+  },
+};
+
+export function getDefaultSiteContentRows() {
+  return Object.entries(DEFAULT_SITE_CONTENT).flatMap(([scope, entries]) =>
+    Object.entries(entries).map(([key, value]) => ({ scope, key, value }))
+  );
+}

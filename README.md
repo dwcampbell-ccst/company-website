@@ -79,7 +79,7 @@ $env:DATABASE_URL="postgresql://postgres.aczgktgnyevfoimzsvlp:Hasan007@aws-0-us-
 npm run db:apply
 ```
 
-This creates `profiles`, `posts`, `pages`, and `contact_messages`, enables RLS, and seeds the default page rows (`home`, `services`, `about`, `contact`). Re-run with the same command any time you need to ensure the schema is present.
+This creates `profiles`, `posts`, `pages`, `site_content`, and `contact_messages`, enables RLS, and seeds the default page rows (`home`, `services`, `about`, `contact`) plus the default text-only content keys. Re-run with the same command any time you need to ensure the schema is present.
 
 ## Deployment (Vercel)
 
@@ -92,7 +92,7 @@ This creates `profiles`, `posts`, `pages`, and `contact_messages`, enables RLS, 
 
 1. Create an admin user in Supabase Auth, then insert a matching row into `public.profiles` with `role='admin'`.
 2. Login at `/login`.
-3. Manage pages at `/admin/pages` and posts at `/admin/posts`. Public pages and the blog read directly from Supabase.
+3. Manage posts at `/admin/posts`, page HTML/hero fields at `/admin/pages`, and all other text-only copy at `/admin/content`. Public pages and the blog read directly from Supabase.
 
 ## Contact form
 

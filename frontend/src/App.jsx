@@ -10,6 +10,7 @@ import LoginPage from "./pages/LoginPage";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminPosts from "./pages/admin/AdminPosts";
 import AdminPages from "./pages/admin/AdminPages";
+import AdminSiteContent from "./pages/admin/AdminSiteContent";
 import RequireAdmin from "./components/RequireAdmin";
 
 function App() {
@@ -45,6 +46,14 @@ function App() {
             element={
               <RequireAdmin>
                 <AdminPages />
+              </RequireAdmin>
+            }
+          />
+          <Route
+            path="/admin/content"
+            element={
+              <RequireAdmin>
+                <AdminSiteContent />
               </RequireAdmin>
             }
           />

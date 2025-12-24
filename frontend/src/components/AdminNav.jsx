@@ -41,6 +41,14 @@ const AdminNav = () => {
       >
         Manage Page Content
       </NavLink>
+      <NavLink
+        to="/admin/content"
+        className={({ isActive }) =>
+          `${base} ${isActive ? "bg-[#0f1a0f] text-white" : "bg-white border-gray-300 text-[#0f1a0f] hover:border-black"}`
+        }
+      >
+        Manage Site Text
+      </NavLink>
       <button
         type="button"
         onClick={handleLogout}

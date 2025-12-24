@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { usePageContent } from "../hooks/usePageContent";
-import { contactContent } from "../content/siteContent";
+import { useSiteContent } from "../hooks/useSiteContent";
 
 const HUBSPOT_MEETING_URL = (import.meta.env.VITE_HUBSPOT_MEETING_URL || "").trim();
 const HUBSPOT_MEETING_EMBED =
   HUBSPOT_MEETING_URL &&
   `${HUBSPOT_MEETING_URL}${HUBSPOT_MEETING_URL.includes("?") ? "&" : "?"}embed=true`;
+
+const DEFAULT_CALENDAR_HREF = "/contact#calendar";
 
 const topicToFilename = (topic) => {
   const safe = (topic || "General Inquiry")
@@ -18,18 +20,35 @@ const topicToFilename = (topic) => {
 
 export default function ContactPage() {
   const { page, loading, error } = usePageContent("contact");
+  const { t, tLines } = useSiteContent("contact");
   const [searchParams] = useSearchParams();
-  const [form, setForm] = useState({
+
+  const topics = tLines("topics", ["General Inquiry"]);
+  const topicsKey = topics.join("\n");
+  const defaultTopic = topics.includes("General Inquiry") ? "General Inquiry" : topics[0] || "General Inquiry";
+
+  const [form, setForm] = useState(() => ({
     name: "",
     email: "",
     company: "",
     phone: "",
-    topics: new Set(["General Inquiry"]),
+    topics: new Set([defaultTopic]),
     message: "",
-  });
+  }));
   const [status, setStatus] = useState("");
   const [sending, setSending] = useState(false);
   const [showMeetingModal, setShowMeetingModal] = useState(false);
+
+  useEffect(() => {
+    setForm((prev) => {
+      const allowed = new Set(topics);
+      const next = new Set(Array.from(prev.topics).filter((topic) => allowed.has(topic)));
+      if (next.size === 0) {
+        next.add(defaultTopic);
+      }
+      return { ...prev, topics: next };
+    });
+  }, [defaultTopic, topicsKey]);
 
   useEffect(() => {
     const rawTopic = (searchParams.get("topic") || "").trim();
@@ -47,11 +66,11 @@ export default function ContactPage() {
 
     const normalized = rawTopic.toLowerCase();
     const desired = aliasMap[normalized] || rawTopic;
-    const allowed = new Set(contactContent.topics);
-    const selected = allowed.has(desired) ? desired : "General Inquiry";
+    const allowed = new Set(topics);
+    const selected = allowed.has(desired) ? desired : defaultTopic;
 
     setForm((prev) => ({ ...prev, topics: new Set([selected]) }));
-  }, [searchParams]);
+  }, [searchParams, defaultTopic, topicsKey]);
 
   const toggleTopic = (topic) => {
     setForm((prev) => {
@@ -62,7 +81,7 @@ export default function ContactPage() {
         next.add(topic);
       }
       if (next.size === 0) {
-        next.add("General Inquiry");
+        next.add(defaultTopic);
       }
       return { ...prev, topics: next };
     });
@@ -79,7 +98,7 @@ export default function ContactPage() {
     setStatus("");
 
     const selectedTopics = Array.from(form.topics);
-    const primaryTopic = selectedTopics[0] || "General Inquiry";
+    const primaryTopic = selectedTopics[0] || defaultTopic;
     const topicLine = selectedTopics.join(", ");
     const subject = `Contact: ${topicLine}`;
 
@@ -121,9 +140,7 @@ export default function ContactPage() {
 
       const result = await res.json().catch(() => ({}));
       setStatus(
-        result?.emailSent === false
-          ? "Thank you! Your message was received, but email delivery is not set up yet."
-          : "Thank you! We will get back to you soon."
+        result?.emailSent === false ? t("form.status.successNoEmail") : t("form.status.success")
       );
       triggerDownload();
       setForm({
@@ -131,11 +148,11 @@ export default function ContactPage() {
         email: "",
         company: "",
         phone: "",
-        topics: new Set(["General Inquiry"]),
+        topics: new Set([defaultTopic]),
         message: "",
       });
     } catch (err) {
-      setStatus("Something went wrong. Please try again.");
+      setStatus(t("form.status.error"));
     } finally {
       setSending(false);
     }
@@ -150,8 +167,7 @@ export default function ContactPage() {
     }
 
     // Otherwise fall back to scrolling to the calendar section.
-    const fallbackLink = contactContent.contactInfo.scheduleHref || "#calendar";
-    const targetId = fallbackLink.split("#")[1];
+    const targetId = DEFAULT_CALENDAR_HREF.split("#")[1];
     if (targetId) {
       event.preventDefault();
       const el = document.getElementById(targetId);
@@ -166,14 +182,12 @@ export default function ContactPage() {
       <div className="glass-panel p-6 md:p-8 grid gap-6 md:grid-cols-[1fr_1.1fr] items-start">
         <div className="space-y-4">
           <p className="pill inline-flex bg-white/80 px-3 py-1 text-xs uppercase tracking-[0.18em] text-gray-700">
-            Contact
+            {t("page.eyebrow", "Contact")}
           </p>
           <h1 className="text-3xl md:text-4xl font-bold text-[#0f1a0f]">
-            {page?.hero_title || contactContent.introTitle}
+            {page?.hero_title || t("page.introTitle")}
           </h1>
-          <p className="text-gray-700 text-lg">
-            {page?.hero_subtitle || contactContent.introSubtitle}
-          </p>
+          <p className="text-gray-700 text-lg">{page?.hero_subtitle || t("page.introSubtitle")}</p>
 
           {loading ? (
             <p className="text-sm text-gray-600">Loading contact details...</p>
@@ -186,26 +200,34 @@ export default function ContactPage() {
           ) : null}
 
           <div className="glass-panel bg-white/90 border border-gray-100 p-4 space-y-2">
-            <h3 className="text-lg font-semibold text-[#0f1a0f]">Contact Information</h3>
+            <h3 className="text-lg font-semibold text-[#0f1a0f]">{t("contactInfo.heading")}</h3>
             <ul className="space-y-1 text-sm text-gray-800">
-              <li>Email: {contactContent.contactInfo.email}</li>
-              <li>Phone: {contactContent.contactInfo.phone}</li>
-              <li>Business: {contactContent.contactInfo.business}</li>
-              <li>Location: {contactContent.contactInfo.location}</li>
+              <li>
+                {t("contactInfo.emailLabel")}: {t("contactInfo.email")}
+              </li>
+              <li>
+                {t("contactInfo.phoneLabel")}: {t("contactInfo.phone")}
+              </li>
+              <li>
+                {t("contactInfo.businessLabel")}: {t("contactInfo.business")}
+              </li>
+              <li>
+                {t("contactInfo.locationLabel")}: {t("contactInfo.location")}
+              </li>
             </ul>
             <a
-              href={HUBSPOT_MEETING_URL || contactContent.contactInfo.scheduleHref || "#calendar"}
+              href={HUBSPOT_MEETING_URL || DEFAULT_CALENDAR_HREF}
               onClick={handleScheduleClick}
               className="inline-flex items-center rounded-full bg-[#2fb3d5] px-4 py-2 text-sm font-semibold text-white hover:bg-[#2295b2] transition"
             >
-              {contactContent.contactInfo.scheduleLabel}
+              {t("contactInfo.scheduleLabel")}
             </a>
           </div>
 
           <div className="space-y-2">
-            <h3 className="text-lg font-semibold text-[#0f1a0f]">Why organizations contact CCST</h3>
+            <h3 className="text-lg font-semibold text-[#0f1a0f]">{t("reasons.heading")}</h3>
             <ul className="space-y-1 text-sm text-gray-800 list-disc pl-5">
-              {contactContent.reasons.map((item) => (
+              {tLines("reasons.list").map((item) => (
                 <li key={item}>{item}</li>
               ))}
             </ul>
@@ -213,12 +235,12 @@ export default function ContactPage() {
         </div>
 
         <div className="glass-panel p-6 md:p-8 space-y-4 fade-in">
-          <h2 className="text-xl font-semibold text-[#0f1a0f]">Send us a message</h2>
+          <h2 className="text-xl font-semibold text-[#0f1a0f]">{t("form.heading")}</h2>
           <form className="space-y-4" onSubmit={handleSubmit}>
             <div className="grid md:grid-cols-2 gap-4">
               <div className="space-y-1">
                 <label className="text-sm font-semibold text-gray-700" htmlFor="name">
-                  Name
+                  {t("form.labels.name")}
                 </label>
                 <input
                   id="name"
@@ -232,7 +254,7 @@ export default function ContactPage() {
 
               <div className="space-y-1">
                 <label className="text-sm font-semibold text-gray-700" htmlFor="email">
-                  Email
+                  {t("form.labels.email")}
                 </label>
                 <input
                   id="email"
@@ -249,7 +271,7 @@ export default function ContactPage() {
             <div className="grid md:grid-cols-2 gap-4">
               <div className="space-y-1">
                 <label className="text-sm font-semibold text-gray-700" htmlFor="company">
-                  Company
+                  {t("form.labels.company")}
                 </label>
                 <input
                   id="company"
@@ -262,7 +284,7 @@ export default function ContactPage() {
 
               <div className="space-y-1">
                 <label className="text-sm font-semibold text-gray-700" htmlFor="phone">
-                  Phone (optional)
+                  {t("form.labels.phone")}
                 </label>
                 <input
                   id="phone"
@@ -275,9 +297,9 @@ export default function ContactPage() {
             </div>
 
             <div className="space-y-2">
-              <p className="text-sm font-semibold text-gray-700">Topic / Service of Interest</p>
+              <p className="text-sm font-semibold text-gray-700">{t("form.labels.topic")}</p>
               <div className="grid grid-cols-2 gap-2">
-                {contactContent.topics.map((topic) => (
+                {topics.map((topic) => (
                   <label key={topic} className="flex items-center gap-2 text-sm text-gray-800">
                     <input
                       type="checkbox"
@@ -293,7 +315,7 @@ export default function ContactPage() {
 
             <div className="space-y-1">
               <label className="text-sm font-semibold text-gray-700" htmlFor="message">
-                Message
+                {t("form.labels.message")}
               </label>
               <textarea
                 id="message"
@@ -311,11 +333,11 @@ export default function ContactPage() {
               disabled={sending}
               className="w-full bg-[#0f1a0f] text-white py-2 rounded-md font-semibold hover:bg-black transition disabled:opacity-70"
             >
-              {sending ? "Sending..." : "Submit"}
+              {sending ? t("form.sendingLabel") : t("form.submitLabel")}
             </button>
           </form>
           {status && <p className="text-sm text-gray-700">{status}</p>}
-          <p className="text-xs text-gray-600">Your information is confidential and used only to respond.</p>
+          <p className="text-xs text-gray-600">{t("form.privacyNote")}</p>
         </div>
       </div>
 
@@ -324,17 +346,17 @@ export default function ContactPage() {
           <div className="relative w-full max-w-4xl bg-white rounded-xl shadow-2xl overflow-hidden">
             <button
               type="button"
-              aria-label="Close scheduler"
+              aria-label={t("scheduler.closeLabel")}
               onClick={() => setShowMeetingModal(false)}
               className="absolute top-3 right-3 h-9 w-9 rounded-full bg-white text-gray-700 border border-gray-200 shadow-sm hover:bg-gray-100"
             >
-              ✕
+              ×
             </button>
             <div className="p-4 border-b border-gray-100" aria-hidden="true" />
             <div className="w-full" style={{ minHeight: "780px" }}>
               <iframe
                 src={HUBSPOT_MEETING_EMBED}
-                title="Book a Strategic Intro Call"
+                title={t("scheduler.modalTitle")}
                 style={{ width: "100%", minHeight: "780px", border: "none" }}
                 loading="lazy"
               />
@@ -345,3 +367,4 @@ export default function ContactPage() {
     </section>
   );
 }
+

@@ -1,17 +1,18 @@
 import { useState } from "react";
 import { NavLink, Link } from "react-router-dom";
-import { navCta } from "../content/siteContent";
+import { useSiteContent } from "../hooks/useSiteContent";
 
 const navItems = [
-  { to: "/", label: "Home" },
-  { to: "/services", label: "Services" },
-  { to: "/articles", label: "Articles" },
-  { to: "/about", label: "About" },
-  { to: "/contact", label: "Contact Us" },
+  { to: "/", key: "header.nav.home" },
+  { to: "/services", key: "header.nav.services" },
+  { to: "/articles", key: "header.nav.articles" },
+  { to: "/about", key: "header.nav.about" },
+  { to: "/contact", key: "header.nav.contact" },
 ];
 
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const { t } = useSiteContent("global");
 
   const linkClass = ({ isActive }) =>
     [
@@ -27,28 +28,28 @@ const Header = () => {
         <div className="flex flex-col items-center text-center">
           <img
             src="/logo.png"
-            alt="Company Logo"
+            alt={t("header.logoAlt")}
             className="h-16 w-auto mb-1 border-0 shadow-none"
           />
           <span className="text-xs tracking-[0.24em] uppercase text-[#0f1a0f]">
-            Business Analysis and Systems Engineering
+            {t("header.taglineLine1")}
           </span>
           <span className="text-xs tracking-[0.24em] uppercase text-[#0f1a0f]">
-            Done Right
+            {t("header.taglineLine2")}
           </span>
         </div>
 
         <nav className="hidden md:flex gap-6 text-sm font-semibold items-center">
           {navItems.map((item) => (
             <NavLink key={item.to} to={item.to} className={linkClass}>
-              {item.label}
+              {t(item.key)}
             </NavLink>
           ))}
           <Link
-            to={navCta.to}
+            to="/contact#form"
             className="inline-flex items-center gap-2 rounded-full bg-[#2fb3d5] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#2295b2] transition"
           >
-            {navCta.label}
+            {t("header.navCtaLabel")}
           </Link>
         </nav>
 
@@ -58,7 +59,7 @@ const Header = () => {
           onClick={() => setMenuOpen((v) => !v)}
           aria-label="Toggle navigation"
         >
-          {menuOpen ? "Close" : "Menu"}
+          {menuOpen ? t("header.mobile.closeLabel") : t("header.mobile.openLabel")}
         </button>
       </div>
 
@@ -72,15 +73,15 @@ const Header = () => {
                 className={linkClass}
                 onClick={closeMenu}
               >
-                {item.label}
+                {t(item.key)}
               </NavLink>
             ))}
             <Link
-              to={navCta.to}
+              to="/contact#form"
               className="inline-flex items-center justify-center rounded-full bg-[#2fb3d5] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#2295b2] transition text-center"
               onClick={closeMenu}
             >
-              {navCta.label}
+              {t("header.navCtaLabel")}
             </Link>
           </div>
         </div>

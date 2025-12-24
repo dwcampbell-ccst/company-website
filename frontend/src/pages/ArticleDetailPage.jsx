@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { supabase } from "../lib/supabaseClient";
+import { useSiteContent } from "../hooks/useSiteContent";
 
 export default function ArticleDetailPage() {
+  const { t } = useSiteContent("article_detail");
   const { slug } = useParams();
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -56,13 +58,13 @@ export default function ArticleDetailPage() {
   }, [slug]);
 
   if (loading) {
-    return <div className="p-6 text-sm">Loading article...</div>;
+    return <div className="p-6 text-sm">{t("loading")}</div>;
   }
 
   if (error || !post) {
     return (
       <div className="p-6 text-sm text-red-700">
-        Failed to load article: {error || "Article not found."}
+        {t("errorPrefix")} {error || "Article not found."}
       </div>
     );
   }
@@ -96,11 +98,11 @@ export default function ArticleDetailPage() {
         <div className="space-y-5">
           <div className="text-sm text-white flex items-center gap-2">
             <Link to="/" className="hover:text-white/80">
-              Home
+              {t("breadcrumbs.home")}
             </Link>
             <span>&gt;</span>
             <Link to="/articles" className="hover:text-white/80">
-              Articles
+              {t("breadcrumbs.articles")}
             </Link>
             <span>&gt;</span>
             <span className="text-white">{post.title}</span>
@@ -116,7 +118,9 @@ export default function ArticleDetailPage() {
             <div className="space-y-2">
               <h1 className="text-3xl md:text-4xl font-bold text-[#0f1a0f] leading-tight">{post.title}</h1>
               {post.published_at && (
-                <p className="text-sm text-gray-600">Published {formatDate(post.published_at)}</p>
+                <p className="text-sm text-gray-600">
+                  {t("publishedPrefix")} {formatDate(post.published_at)}
+                </p>
               )}
               <div className="flex flex-wrap gap-2 text-sm text-gray-600">
                 <span className="px-3 py-1 rounded-full bg-[#e7efe1] border border-gray-200">{post.slug}</span>
@@ -127,7 +131,7 @@ export default function ArticleDetailPage() {
               onClick={handleShare}
               className="inline-flex items-center gap-2 bg-[#0f1a0f] text-white px-4 py-2 rounded-md font-semibold hover:bg-black transition"
             >
-              Share this article
+              {t("shareButtonLabel")}
             </button>
 
             <article className="prose prose-slate max-w-none">
@@ -138,7 +142,9 @@ export default function ArticleDetailPage() {
 
         <aside className="space-y-6">
           <div className="glass-panel p-4 space-y-3">
-            <h3 className="text-lg font-semibold text-[#0f1a0f] border-b border-gray-200 pb-2">Recent Posts</h3>
+            <h3 className="text-lg font-semibold text-[#0f1a0f] border-b border-gray-200 pb-2">
+              {t("sidebar.recentHeading")}
+            </h3>
             <ul className="space-y-2 text-sm text-gray-800">
               {recentPosts.map((item) => (
                 <li key={item.id} className="flex items-start gap-2">
@@ -148,12 +154,14 @@ export default function ArticleDetailPage() {
                   </Link>
                 </li>
               ))}
-              {recentPosts.length === 0 && <li className="text-gray-600">No posts yet.</li>}
+              {recentPosts.length === 0 && <li className="text-gray-600">{t("sidebar.noPostsYet")}</li>}
             </ul>
           </div>
 
           <div className="glass-panel p-4 space-y-3">
-            <h3 className="text-lg font-semibold text-[#0f1a0f] border-b border-gray-200 pb-2">Archives</h3>
+            <h3 className="text-lg font-semibold text-[#0f1a0f] border-b border-gray-200 pb-2">
+              {t("sidebar.archivesHeading")}
+            </h3>
             <ul className="space-y-2 text-sm text-gray-800">
               {archives.map((entry) => (
                 <li key={entry} className="flex items-center gap-2">
@@ -161,7 +169,7 @@ export default function ArticleDetailPage() {
                   <span>{entry}</span>
                 </li>
               ))}
-              {archives.length === 0 && <li className="text-gray-600">No archives yet.</li>}
+              {archives.length === 0 && <li className="text-gray-600">{t("sidebar.noArchivesYet")}</li>}
             </ul>
           </div>
         </aside>
