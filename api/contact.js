@@ -2,9 +2,22 @@ const nodemailer = require("nodemailer");
 const { createClient } = require("@supabase/supabase-js");
 const https = require("https");
 
+const RATE_LIMIT_MAX = 3;
+const RATE_LIMIT_WINDOW_MS = 24 * 60 * 60 * 1000;
+
 function normalizeText(value) {
   if (typeof value !== "string") return "";
   return value.trim();
+}
+
+function getClientIp(req) {
+  const forwarded = normalizeText(req.headers?.["x-forwarded-for"]);
+  if (forwarded) {
+    const first = forwarded.split(",")[0]?.trim();
+    if (first) return first;
+  }
+
+  return normalizeText(req.socket?.remoteAddress || req.connection?.remoteAddress);
 }
 
 function normalizeOptionalText(value) {
@@ -156,6 +169,14 @@ module.exports = async (req, res) => {
   }
 
   const payload = req.body || {};
+  const honeypotValue = normalizeText(
+    payload.website || payload.company_website || payload.companyWebsite || payload.hp
+  );
+  if (honeypotValue) {
+    res.status(400).json({ error: "Spam detected" });
+    return;
+  }
+
   const name = normalizeText(payload.name);
   const email = normalizeText(payload.email);
   const company = normalizeOptionalText(payload.company);
@@ -187,6 +208,25 @@ module.exports = async (req, res) => {
     auth: { autoRefreshToken: false, persistSession: false },
   });
 
+  const clientIp = getClientIp(req);
+  if (clientIp) {
+    const since = new Date(Date.now() - RATE_LIMIT_WINDOW_MS).toISOString();
+    const { count, error: rateLimitError } = await supabase
+      .from("contact_messages")
+      .select("id", { count: "exact", head: true })
+      .eq("ip_address", clientIp)
+      .gte("created_at", since);
+
+    if (rateLimitError) {
+      console.error("Rate limit check failed:", rateLimitError);
+    } else if ((count || 0) >= RATE_LIMIT_MAX) {
+      res.status(429).json({ error: "Rate limit exceeded" });
+      return;
+    }
+  } else {
+    console.warn("Contact submission missing client IP; skipping rate limit.");
+  }
+
   // Store the message securely (service role bypasses RLS)
   const { data: inserted, error: insertError } = await supabase
     .from("contact_messages")
@@ -200,6 +240,7 @@ module.exports = async (req, res) => {
       message,
       download_path: downloadPath,
       download_filename: downloadFilename,
+      ip_address: clientIp || null,
     })
     .select("id")
     .single();

@@ -52,6 +52,7 @@ create table if not exists public.contact_messages (
   topics text[],
   subject text,
   message text,
+  ip_address text,
   download_path text,
   download_filename text,
   hubspot_contact_id text,
@@ -63,6 +64,7 @@ create table if not exists public.contact_messages (
 alter table public.contact_messages add column if not exists company text;
 alter table public.contact_messages add column if not exists phone text;
 alter table public.contact_messages add column if not exists topics text[];
+alter table public.contact_messages add column if not exists ip_address text;
 alter table public.contact_messages add column if not exists download_path text;
 alter table public.contact_messages add column if not exists download_filename text;
 alter table public.contact_messages add column if not exists hubspot_contact_id text;

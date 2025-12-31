@@ -32,6 +32,7 @@ export default function ContactPage() {
     email: "",
     company: "",
     phone: "",
+    website: "",
     topics: new Set([defaultTopic]),
     message: "",
   }));
@@ -126,6 +127,7 @@ export default function ContactPage() {
           email: form.email,
           company: form.company,
           phone: form.phone,
+          website: form.website,
           topics: selectedTopics,
           subject,
           message: form.message.trim(),
@@ -134,11 +136,16 @@ export default function ContactPage() {
         }),
       });
 
+      const result = await res.json().catch(() => ({}));
       if (!res.ok) {
-        throw new Error("Request failed");
+        if (res.status === 429) {
+          setStatus(t("form.status.rateLimited"));
+        } else {
+          setStatus(t("form.status.error"));
+        }
+        return;
       }
 
-      const result = await res.json().catch(() => ({}));
       setStatus(
         result?.emailSent === false ? t("form.status.successNoEmail") : t("form.status.success")
       );
@@ -148,6 +155,7 @@ export default function ContactPage() {
         email: "",
         company: "",
         phone: "",
+        website: "",
         topics: new Set([defaultTopic]),
         message: "",
       });
@@ -324,6 +332,19 @@ export default function ContactPage() {
                 rows={5}
                 className="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#2fb3d5]"
                 value={form.message}
+                onChange={handleChange}
+              />
+            </div>
+
+            <div className="sr-only" aria-hidden="true">
+              <label htmlFor="website">Website</label>
+              <input
+                id="website"
+                name="website"
+                type="text"
+                tabIndex={-1}
+                autoComplete="off"
+                value={form.website}
                 onChange={handleChange}
               />
             </div>

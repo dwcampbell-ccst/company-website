@@ -175,6 +175,8 @@ export const DEFAULT_SITE_CONTENT = {
     "form.status.success": "Thank you! We will get back to you soon.",
     "form.status.successNoEmail":
       "Thank you! Your message was received, but email delivery is not set up yet.",
+    "form.status.rateLimited":
+      "Too many submissions from this network today. Please try again tomorrow.",
     "form.status.error": "Something went wrong. Please try again.",
     "form.privacyNote": "Your information is confidential and used only to respond.",
     "scheduler.modalTitle": "Book a Strategic Intro Call",
