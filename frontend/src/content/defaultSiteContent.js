@@ -158,6 +158,7 @@ export const DEFAULT_SITE_CONTENT = {
     "contactInfo.business": "Campbell Consulting Services of Tallahassee LLC",
     "contactInfo.location": "Tallahassee, Florida",
     "contactInfo.scheduleLabel": "Book a Strategic Intro Call",
+    "contactInfo.scheduleLimit": "You've reached the hourly limit for intro call clicks. Please try again later.",
     "reasons.heading": "Why organizations contact CCST",
     "reasons.list":
       "Service-Disabled Veteran-Owned Small Business (SDVOSB)\nProven experience supporting state and federal agencies\nClear, structured consulting grounded in systems thinking",

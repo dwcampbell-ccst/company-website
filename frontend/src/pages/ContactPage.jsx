@@ -9,6 +9,9 @@ const HUBSPOT_MEETING_EMBED =
   `${HUBSPOT_MEETING_URL}${HUBSPOT_MEETING_URL.includes("?") ? "&" : "?"}embed=true`;
 
 const DEFAULT_CALENDAR_HREF = "/contact#calendar";
+const SCHEDULE_CLICK_LIMIT = 10;
+const SCHEDULE_CLICK_WINDOW_MS = 60 * 60 * 1000;
+const SCHEDULE_CLICK_STORAGE_KEY = "ccst_schedule_clicks";
 
 const topicToFilename = (topic) => {
   const safe = (topic || "General Inquiry")
@@ -16,6 +19,43 @@ const topicToFilename = (topic) => {
     .replace(/[^A-Za-z0-9]+/g, "_")
     .replace(/^_+|_+$/g, "") || "Download";
   return `${safe}.pdf`;
+};
+
+const readScheduleClicks = () => {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = window.localStorage.getItem(SCHEDULE_CLICK_STORAGE_KEY);
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (_) {
+    return [];
+  }
+};
+
+const writeScheduleClicks = (list) => {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(SCHEDULE_CLICK_STORAGE_KEY, JSON.stringify(list));
+  } catch (_) {
+    // Ignore storage write errors.
+  }
+};
+
+const registerScheduleClick = () => {
+  if (typeof window === "undefined") return true;
+  const now = Date.now();
+  const recent = readScheduleClicks().filter(
+    (timestamp) => typeof timestamp === "number" && now - timestamp < SCHEDULE_CLICK_WINDOW_MS
+  );
+
+  if (recent.length >= SCHEDULE_CLICK_LIMIT) {
+    writeScheduleClicks(recent);
+    return false;
+  }
+
+  recent.push(now);
+  writeScheduleClicks(recent);
+  return true;
 };
 
 export default function ContactPage() {
@@ -39,6 +79,7 @@ export default function ContactPage() {
   const [status, setStatus] = useState("");
   const [sending, setSending] = useState(false);
   const [showMeetingModal, setShowMeetingModal] = useState(false);
+  const [scheduleStatus, setScheduleStatus] = useState("");
 
   useEffect(() => {
     setForm((prev) => {
@@ -167,6 +208,14 @@ export default function ContactPage() {
   };
 
   const handleScheduleClick = (event) => {
+    if (!registerScheduleClick()) {
+      event.preventDefault();
+      setScheduleStatus(t("contactInfo.scheduleLimit"));
+      return;
+    }
+
+    setScheduleStatus("");
+
     // If a HubSpot meeting URL is configured, open the modal embed.
     if (HUBSPOT_MEETING_EMBED) {
       event.preventDefault();
@@ -230,6 +279,7 @@ export default function ContactPage() {
             >
               {t("contactInfo.scheduleLabel")}
             </a>
+            {scheduleStatus && <p className="text-xs text-red-700">{scheduleStatus}</p>}
           </div>
 
           <div className="space-y-2">
