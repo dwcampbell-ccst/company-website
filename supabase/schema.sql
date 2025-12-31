@@ -61,6 +61,16 @@ create table if not exists public.contact_messages (
   created_at timestamp with time zone default now()
 );
 
+create table if not exists public.intro_call_requests (
+  id bigserial primary key,
+  ip_address text,
+  user_agent text,
+  created_at timestamp with time zone default now()
+);
+
+create index if not exists intro_call_requests_ip_created_at_idx
+  on public.intro_call_requests(ip_address, created_at);
+
 alter table public.contact_messages add column if not exists company text;
 alter table public.contact_messages add column if not exists phone text;
 alter table public.contact_messages add column if not exists topics text[];
@@ -102,6 +112,7 @@ alter table public.posts enable row level security;
 alter table public.pages enable row level security;
 alter table public.site_content enable row level security;
 alter table public.contact_messages enable row level security;
+alter table public.intro_call_requests enable row level security;
 alter table public.profiles enable row level security;
 
 -- Profiles policies

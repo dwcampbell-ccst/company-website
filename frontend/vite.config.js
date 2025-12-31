@@ -4,6 +4,7 @@ import react from "@vitejs/plugin-react";
 
 const require = createRequire(import.meta.url);
 const contactHandler = require("../api/contact");
+const introCallHandler = require("../api/intro-call");
 
 export default defineConfig(({ mode }) => {
   // Load env from the repo root so .env at company-website/ is used.
@@ -22,7 +23,19 @@ export default defineConfig(({ mode }) => {
   const contactDevPlugin = {
     name: "contact-dev-middleware",
     configureServer(server) {
-      server.middlewares.use("/api/contact", (req, res) => {
+      const handlers = {
+        "/api/contact": contactHandler,
+        "/api/intro-call": introCallHandler,
+      };
+
+      server.middlewares.use((req, res, next) => {
+        const pathname = req.url.split("?")[0];
+        const handler = handlers[pathname];
+        if (!handler) {
+          next();
+          return;
+        }
+
         res.setHeader("Access-Control-Allow-Origin", "*");
         res.setHeader("Access-Control-Allow-Headers", "Content-Type");
         res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
@@ -66,9 +79,9 @@ export default defineConfig(({ mode }) => {
           };
 
           try {
-            await contactHandler(req, res);
+            await handler(req, res);
           } catch (err) {
-            console.error("Contact handler error:", err);
+            console.error("API handler error:", err);
             if (!res.headersSent) {
               res.statusCode = 500;
               res.end("Server error");

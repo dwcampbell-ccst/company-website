@@ -2,6 +2,7 @@ const http = require("http");
 const path = require("path");
 const { config } = require("dotenv");
 const contactHandler = require("./contact");
+const introCallHandler = require("./intro-call");
 
 config({ path: path.resolve(__dirname, "../.env") });
 
@@ -20,7 +21,13 @@ const server = http.createServer((req, res) => {
 
   const pathname = req.url.split("?")[0];
 
-  if (pathname === "/api/contact") {
+  const handlers = {
+    "/api/contact": contactHandler,
+    "/api/intro-call": introCallHandler,
+  };
+
+  const handler = handlers[pathname];
+  if (handler) {
     let rawBody = "";
 
     req.on("data", (chunk) => {
@@ -49,9 +56,9 @@ const server = http.createServer((req, res) => {
       };
 
       try {
-        await contactHandler(req, res);
+        await handler(req, res);
       } catch (err) {
-        console.error("Contact handler error:", err);
+        console.error("API handler error:", err);
         if (!res.headersSent) {
           res.statusCode = 500;
           res.end("Server error");

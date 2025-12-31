@@ -41,27 +41,27 @@ const writeScheduleClicks = (list) => {
   }
 };
 
-const registerScheduleClick = () => {
-  if (typeof window === "undefined") return true;
+const getRecentScheduleClicks = () => {
+  if (typeof window === "undefined") return [];
   const now = Date.now();
   const recent = readScheduleClicks().filter(
     (timestamp) => typeof timestamp === "number" && now - timestamp < SCHEDULE_CLICK_WINDOW_MS
   );
-
-  if (recent.length >= SCHEDULE_CLICK_LIMIT) {
-    writeScheduleClicks(recent);
-    return false;
-  }
-
-  recent.push(now);
   writeScheduleClicks(recent);
-  return true;
+  return recent;
+};
+
+const recordScheduleClick = (recent) => {
+  if (typeof window === "undefined") return;
+  const next = [...recent, Date.now()];
+  writeScheduleClicks(next);
 };
 
 export default function ContactPage() {
   const { page, loading, error } = usePageContent("contact");
   const { t, tLines } = useSiteContent("contact");
   const [searchParams] = useSearchParams();
+  const apiBase = (import.meta.env.VITE_CONTACT_API_URL || "").replace(/\/$/, "");
 
   const topics = tLines("topics", ["General Inquiry"]);
   const topicsKey = topics.join("\n");
@@ -80,6 +80,7 @@ export default function ContactPage() {
   const [sending, setSending] = useState(false);
   const [showMeetingModal, setShowMeetingModal] = useState(false);
   const [scheduleStatus, setScheduleStatus] = useState("");
+  const [scheduleChecking, setScheduleChecking] = useState(false);
 
   useEffect(() => {
     setForm((prev) => {
@@ -144,7 +145,6 @@ export default function ContactPage() {
     const topicLine = selectedTopics.join(", ");
     const subject = `Contact: ${topicLine}`;
 
-    const apiBase = (import.meta.env.VITE_CONTACT_API_URL || "").replace(/\/$/, "");
     const endpoint = `${apiBase}/api/contact`;
 
     const downloadFilename = topicToFilename(primaryTopic);
@@ -207,30 +207,56 @@ export default function ContactPage() {
     }
   };
 
-  const handleScheduleClick = (event) => {
-    if (!registerScheduleClick()) {
-      event.preventDefault();
+  const handleScheduleClick = async (event) => {
+    event.preventDefault();
+
+    if (scheduleChecking) return;
+
+    const recentClicks = getRecentScheduleClicks();
+    if (recentClicks.length >= SCHEDULE_CLICK_LIMIT) {
       setScheduleStatus(t("contactInfo.scheduleLimit"));
       return;
     }
 
+    setScheduleChecking(true);
     setScheduleStatus("");
 
-    // If a HubSpot meeting URL is configured, open the modal embed.
-    if (HUBSPOT_MEETING_EMBED) {
-      event.preventDefault();
-      setShowMeetingModal(true);
-      return;
-    }
+    try {
+      const res = await fetch(`${apiBase}/api/intro-call`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({}),
+      });
 
-    // Otherwise fall back to scrolling to the calendar section.
-    const targetId = DEFAULT_CALENDAR_HREF.split("#")[1];
-    if (targetId) {
-      event.preventDefault();
-      const el = document.getElementById(targetId);
-      if (el) {
-        el.scrollIntoView({ behavior: "smooth", block: "start" });
+      if (!res.ok) {
+        if (res.status === 429) {
+          setScheduleStatus(t("contactInfo.scheduleLimit"));
+        } else {
+          setScheduleStatus(t("contactInfo.scheduleError"));
+        }
+        return;
       }
+
+      recordScheduleClick(recentClicks);
+
+      // If a HubSpot meeting URL is configured, open the modal embed.
+      if (HUBSPOT_MEETING_EMBED) {
+        setShowMeetingModal(true);
+        return;
+      }
+
+      // Otherwise fall back to scrolling to the calendar section.
+      const targetId = DEFAULT_CALENDAR_HREF.split("#")[1];
+      if (targetId) {
+        const el = document.getElementById(targetId);
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      }
+    } catch (err) {
+      setScheduleStatus(t("contactInfo.scheduleError"));
+    } finally {
+      setScheduleChecking(false);
     }
   };
 
@@ -275,7 +301,10 @@ export default function ContactPage() {
             <a
               href={HUBSPOT_MEETING_URL || DEFAULT_CALENDAR_HREF}
               onClick={handleScheduleClick}
-              className="inline-flex items-center rounded-full bg-[#2fb3d5] px-4 py-2 text-sm font-semibold text-white hover:bg-[#2295b2] transition"
+              className={`inline-flex items-center rounded-full bg-[#2fb3d5] px-4 py-2 text-sm font-semibold text-white hover:bg-[#2295b2] transition ${
+                scheduleChecking ? "pointer-events-none opacity-70" : ""
+              }`}
+              aria-disabled={scheduleChecking}
             >
               {t("contactInfo.scheduleLabel")}
             </a>
