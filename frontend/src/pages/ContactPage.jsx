@@ -14,6 +14,16 @@ const SCHEDULE_CLICK_WINDOW_MS = 60 * 60 * 1000;
 const SCHEDULE_CLICK_STORAGE_KEY = "ccst_schedule_clicks";
 
 const topicToFilename = (topic) => {
+  const filenameMap = {
+    "Software Development": "Automation_Preview_Pack.zip",
+    "SLED Contracting": "SLED_Solutions_Brief.zip",
+    "Strategic Decision Support": "Strategic_Decision_Clarity_Pack.zip",
+  };
+
+  if (filenameMap[topic]) {
+    return filenameMap[topic];
+  }
+
   const safe = (topic || "General Inquiry")
     .trim()
     .replace(/[^A-Za-z0-9]+/g, "_")
