@@ -1,66 +1,129 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout";
+import Seo from "./components/Seo";
 import HomePage from "./pages/HomePage";
 import ServicesPage from "./pages/ServicesPage";
+import RegentPage from "./pages/RegentPage";
 import ArticlesPage from "./pages/ArticlesPage";
 import ArticleDetailPage from "./pages/ArticleDetailPage";
 import AboutPage from "./pages/AboutPage";
 import ContactPage from "./pages/ContactPage";
-import LoginPage from "./pages/LoginPage";
-import AdminDashboard from "./pages/admin/AdminDashboard";
-import AdminPosts from "./pages/admin/AdminPosts";
-import AdminPages from "./pages/admin/AdminPages";
-import AdminSiteContent from "./pages/admin/AdminSiteContent";
-import RequireAdmin from "./components/RequireAdmin";
+import NotFoundPage from "./pages/NotFoundPage";
+import { PAGES, POSTS, SITE_CONTENT } from "./generated/content";
 
-function App() {
+const organizationSchema = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "Campbell Consulting Services of Tallahassee (CCST)",
+  url: "https://www.consultcampbell.com",
+  logo: "https://www.consultcampbell.com/logo.png",
+  description: "SDVOSB consultancy building AI governance infrastructure and systems solutions.",
+  address: {
+    "@type": "PostalAddress",
+    addressLocality: "Tallahassee",
+    addressRegion: "FL",
+    addressCountry: "US",
+  },
+  sameAs: [
+    "https://www.linkedin.com/company/campbell-consulting-services-of-tallahassee",
+    "https://thesystemsthinkerdwc.substack.com",
+  ],
+};
+
+const getRegentStructuredData = () => {
+  const content = SITE_CONTENT.regent || {};
+  return [
+    organizationSchema,
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      name: "Regent",
+      applicationCategory: "BusinessApplication",
+      operatingSystem: "Windows",
+      description:
+        "Runtime AI governance: policy enforcement on every AI turn and a tamper-evident audit chain of agent activity.",
+      publisher: {
+        "@type": "Organization",
+        name: "Campbell Consulting Services of Tallahassee (CCST)",
+      },
+      offers: {
+        "@type": "Offer",
+        availability: "https://schema.org/PreOrder",
+        description: "Alpha pilot program",
+      },
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      mainEntity: [1, 2, 3, 4].map((item) => ({
+        "@type": "Question",
+        name: content[`faq.${item}.question`],
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: content[`faq.${item}.answer`],
+        },
+      })),
+    },
+  ];
+};
+
+function PageRoute({ slug, children }) {
+  const page = PAGES[slug];
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route element={<Layout />}>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/services" element={<ServicesPage />} />
-          <Route path="/articles" element={<ArticlesPage />} />
-          <Route path="/articles/:slug" element={<ArticleDetailPage />} />
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="/contact" element={<ContactPage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route
-            path="/admin"
-            element={
-              <RequireAdmin>
-                <AdminDashboard />
-              </RequireAdmin>
-            }
-          />
-          <Route
-            path="/admin/posts"
-            element={
-              <RequireAdmin>
-                <AdminPosts />
-              </RequireAdmin>
-            }
-          />
-          <Route
-            path="/admin/pages"
-            element={
-              <RequireAdmin>
-                <AdminPages />
-              </RequireAdmin>
-            }
-          />
-          <Route
-            path="/admin/content"
-            element={
-              <RequireAdmin>
-                <AdminSiteContent />
-              </RequireAdmin>
-            }
-          />
-        </Route>
-      </Routes>
-    </BrowserRouter>
+    <>
+      <Seo
+        title={page.seoTitle}
+        description={page.seoDescription}
+        path={page.canonicalPath}
+        image={page.ogImage}
+        structuredData={slug === "regent" ? getRegentStructuredData() : organizationSchema}
+      />
+      {children}
+    </>
   );
 }
 
-export default App;
+export function getStaticRoutes() {
+  return [
+    "/",
+    "/services",
+    "/regent",
+    "/articles",
+    ...POSTS.map((post) => `/articles/${post.slug}`),
+    "/about",
+    "/contact",
+    "/404",
+  ];
+}
+
+export function AppRoutes() {
+  return (
+    <Routes>
+      <Route element={<Layout />}>
+        <Route path="/" element={<PageRoute slug="home"><HomePage /></PageRoute>} />
+        <Route path="/services" element={<PageRoute slug="services"><ServicesPage /></PageRoute>} />
+        <Route path="/regent" element={<PageRoute slug="regent"><RegentPage /></PageRoute>} />
+        <Route path="/articles" element={<PageRoute slug="articles"><ArticlesPage /></PageRoute>} />
+        <Route path="/articles/:slug" element={<ArticleDetailPage />} />
+        <Route path="/about" element={<PageRoute slug="about"><AboutPage /></PageRoute>} />
+        <Route path="/contact" element={<PageRoute slug="contact"><ContactPage /></PageRoute>} />
+        <Route
+          path="*"
+          element={
+            <>
+              <Seo
+                title="Page Not Found | Campbell Consulting"
+                description="The requested page could not be found."
+                path="/404"
+                noindex
+              />
+              <NotFoundPage />
+            </>
+          }
+        />
+      </Route>
+    </Routes>
+  );
+}
+
+export default AppRoutes;

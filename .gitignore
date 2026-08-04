@@ -23,3 +23,25 @@ pnpm-debug.log*
 .DS_Store
 Thumbs.db
 .vscode/
+
+# Internal working files and exports
+/internal/
+/scratch/
+/exports/
+/.tmp*/
+/audits/
+/screenshots/
+*.code-workspace
+hubspot-*.csv
+*-crm.csv
+
+# Superseded local reference/download artifacts
+REGENT_SITE_UPDATE_PACKAGE_*.md
+CCST-Brief.pdf
+ImplementationGuide.txt
+frontend/public/vite.svg
+frontend/src/styles/README.md
+frontend/public/downloads/SLED_Contracting.pdf
+frontend/public/downloads/Software_Development.pdf
+frontend/public/downloads/Strategic_Decision_Support.pdf
+frontend/public/downloads/ccst-brief.pdf

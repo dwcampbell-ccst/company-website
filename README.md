@@ -1,99 +1,74 @@
-# Company Website (React + Supabase + Vercel)
+# Campbell Consulting Website
 
-Monorepo that ships a marketing site with editable pages, blog, authentication, and a secure contact form backed by Supabase and Vercel serverless functions.
+Static React website for Campbell Consulting Services of Tallahassee (CCST). Public pages and articles are managed through Decap CMS, stored in Git, and pre-rendered during the Vercel build. Supabase is used only by server-side lead-capture functions.
 
-## Structure
+## Requirements
 
-```
-company-website/
-  api/              # Vercel serverless functions (contact form)
-  frontend/         # React + Vite + Tailwind client
-  scripts/          # Utility scripts (e.g., apply Supabase schema)
-  supabase/         # SQL schema for tables, policies, and seeds
-  vercel.json       # Vercel build/output config
-```
+- Node.js 22.12 or newer
+- A Supabase project for lead storage
+- GitHub OAuth credentials for Decap CMS
 
-## Prerequisites
+## Project structure
 
-- Node 18+
-- Supabase project with URL, anon key, and service role key
-
-## Environment variables
-
-Create `frontend/.env` for client-side values:
-
-```
-VITE_SUPABASE_URL=...
-VITE_SUPABASE_ANON_KEY=...
-# Optional: embed a HubSpot Meeting link on the Contact page
-VITE_HUBSPOT_MEETING_URL=https://meetings.hubspot.com/your-user/your-meeting
+```text
+api/                    Vercel functions for contact, scheduling, and CMS OAuth
+frontend/content/       Git-backed page, article, and site copy
+frontend/public/        Public assets, downloads, and Decap entry page
+frontend/scripts/       Content generation and static rendering
+frontend/src/           React application
+supabase/               Lead-table schema and security migrations
+vercel.json             Deployment and security headers
 ```
 
-Backend/serverless variables (set locally or in Vercel Project Settings):
-
-```
-SUPABASE_URL=...
-SUPABASE_ANON_KEY=...
-SUPABASE_SERVICE_ROLE_KEY=...
-SMTP_HOST=...
-SMTP_PORT=587
-SMTP_USER=...
-SMTP_PASS=...
-SMTP_FROM="Website Contact <no-reply@example.com>"
-CONTACT_RECEIVER_EMAIL=you@example.com
-HUBSPOT_PRIVATE_APP_TOKEN=...
-# Optional: set these only if you created matching custom Contact properties in HubSpot
-# Common internal names: service_of_interest, message_multi_line
-HUBSPOT_CONTACT_TOPICS_PROPERTY=...
-HUBSPOT_CONTACT_MESSAGE_PROPERTY=...
-HUBSPOT_CONTACT_SUBJECT_PROPERTY=...
-HUBSPOT_CONTACT_DOWNLOAD_PROPERTY=...
-```
-
-## Install & run locally
+## Local development
 
 ```bash
-cd company-website
-npm install          # installs root + API deps
-cd frontend && npm install
-cd ..
-# Terminal 1: start the contact API locally (uses .env at repo root)
-npm run api:dev
-# Terminal 2: start the Vite frontend (proxies /api to http://localhost:8788)
+npm ci
+cd frontend
+npm ci
 npm run dev
 ```
 
-Build the production bundle:
+The Vite development middleware runs the contact and intro-call functions with values from the root `.env` file.
+
+## Production verification
 
 ```bash
 npm run build
+cd frontend
+npm test
 ```
 
-## Apply Supabase schema
+The production build generates complete HTML for every public route, published article, the sitemap, robots file, and 404 page.
 
-The schema (tables, RLS policies, triggers, seed pages) lives in `supabase/schema.sql`. To apply it to the provided database, set the connection string and run:
+## Content management
 
-```bash
-cd company-website
-$env:DATABASE_URL="postgresql://postgres.aczgktgnyevfoimzsvlp:Hasan007@aws-0-us-west-2.pooler.supabase.com:5432/postgres"
-npm run db:apply
+Decap CMS is available at `/admin/`. Content is stored in:
+
+- `frontend/content/site.json` for global and section copy
+- `frontend/content/pages/*.json` for page and SEO settings
+- `frontend/content/articles/*.md` for articles
+
+The CMS uses GitHub's editorial workflow: drafts create branches and pull requests, Vercel supplies previews, and approved merges publish the content.
+
+For production authentication, create a GitHub OAuth App with this callback URL:
+
+```text
+https://www.consultcampbell.com/api/callback
 ```
 
-This creates `profiles`, `posts`, `pages`, `site_content`, and `contact_messages`, enables RLS, and seeds the default page rows (`home`, `services`, `about`, `contact`) plus the default text-only content keys. Re-run with the same command any time you need to ensure the schema is present.
+Add `GITHUB_OAUTH_CLIENT_ID` and `GITHUB_OAUTH_CLIENT_SECRET` to Vercel. CMS editors must have write access to the private repository.
 
-## Deployment (Vercel)
+## Server environment
 
-- Root directory: repository root (contains `vercel.json` and `/api`).
-- Build command: handled by `vercel.json` (`cd frontend && npm install && npm run build`).
-- Output directory: `frontend/dist`.
-- Environment variables: add the Supabase and SMTP values above. Vite needs `VITE_SUPABASE_*` at build time; the API needs `SUPABASE_*` and SMTP values at runtime.
+Copy `.env.example` to `.env` locally and configure the matching values in Vercel. Never expose `SUPABASE_SERVICE_ROLE_KEY`, SMTP credentials, the HubSpot token, or the GitHub OAuth secret to frontend variables.
 
-## Admin flow
+## Supabase
 
-1. Create an admin user in Supabase Auth, then insert a matching row into `public.profiles` with `role='admin'`.
-2. Login at `/login`.
-3. Manage posts at `/admin/posts`, page HTML/hero fields at `/admin/pages`, and all other text-only copy at `/admin/content`. Public pages and the blog read directly from Supabase.
+The browser does not connect to Supabase. `/api/contact` and `/api/intro-call` validate requests and write through the server-side service role.
 
-## Contact form
+Apply `supabase/schema.sql` to a new database using a securely supplied connection string. Existing installations must also apply migrations from `supabase/migrations/`. Do not place database credentials in this repository.
 
-The frontend posts to `/api/contact`, which stores the message in `contact_messages` (using the Supabase service role key) and sends an email via SMTP. If `HUBSPOT_PRIVATE_APP_TOKEN` is set, the same submission is also synced to HubSpot as a Contact (email/name/company/phone) and can optionally populate custom HubSpot properties for topics/message/download details. On successful submission the user is prompted to download the PDF at `frontend/public/downloads/ccst-brief.pdf`.
+## Deployment
+
+Vercel builds from the repository root using `vercel.json` and publishes `frontend/dist`. Each approved Git merge triggers a deployment automatically.

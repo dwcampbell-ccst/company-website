@@ -1,15 +1,14 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
-import { supabase } from "../lib/supabaseClient";
 import { useSiteContent } from "../hooks/useSiteContent";
+import { POSTS } from "../generated/content";
+import Seo from "../components/Seo";
 
 export default function ArticleDetailPage() {
   const { t } = useSiteContent("article_detail");
   const { slug } = useParams();
-  const [post, setPost] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [allPosts, setAllPosts] = useState([]);
-  const [error, setError] = useState(null);
+  const post = POSTS.find((item) => item.slug === slug) || null;
+  const allPosts = POSTS;
 
   const recentPosts = useMemo(
     () => (post ? allPosts.filter((p) => p.slug !== post.slug).slice(0, 5) : []),
@@ -31,40 +30,10 @@ export default function ArticleDetailPage() {
     });
   }, [allPosts]);
 
-  useEffect(() => {
-    const load = async () => {
-      setError(null);
-      const [{ data: current, error: currentError }, { data: list, error: listError }] = await Promise.all([
-        supabase.from("posts").select("*").eq("slug", slug).single(),
-        supabase
-          .from("posts")
-          .select("id, title, slug, published_at, hero_image_url")
-          .eq("status", "published")
-          .order("published_at", { ascending: false }),
-      ]);
-
-      if (currentError) {
-        setError(currentError.message || "Article not found.");
-        setLoading(false);
-        return;
-      }
-
-      setPost(current);
-      setAllPosts(listError ? [] : list || []);
-      setLoading(false);
-    };
-
-    load();
-  }, [slug]);
-
-  if (loading) {
-    return <div className="p-6 text-sm">{t("loading")}</div>;
-  }
-
-  if (error || !post) {
+  if (!post) {
     return (
       <div className="p-6 text-sm text-red-700">
-        {t("errorPrefix")} {error || "Article not found."}
+        {t("errorPrefix")} Article not found.
       </div>
     );
   }
@@ -92,8 +61,36 @@ export default function ArticleDetailPage() {
     }
   };
 
+  const articleSchema = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: post.title,
+    description: post.excerpt,
+    datePublished: post.published_at,
+    image: post.hero_image_url || undefined,
+    author: {
+      "@type": "Organization",
+      name: "Campbell Consulting Services of Tallahassee (CCST)",
+    },
+    publisher: {
+      "@type": "Organization",
+      name: "Campbell Consulting Services of Tallahassee (CCST)",
+      logo: { "@type": "ImageObject", url: "https://www.consultcampbell.com/logo.png" },
+    },
+    mainEntityOfPage: `https://www.consultcampbell.com/articles/${post.slug}`,
+  };
+
   return (
-    <section className="max-w-6xl mx-auto px-4 py-10 md:py-14">
+    <>
+      <Seo
+        title={post.seo_title || `${post.title} | Campbell Consulting`}
+        description={post.seo_description || post.excerpt}
+        path={`/articles/${post.slug}`}
+        image={post.hero_image_url || "/og-consultcampbell.jpg"}
+        type="article"
+        structuredData={articleSchema}
+      />
+      <section className="max-w-6xl mx-auto px-4 py-10 md:py-14">
       <div className="grid gap-8 lg:grid-cols-[2fr_1fr]">
         <div className="space-y-5">
           <div className="text-sm text-white flex items-center gap-2">
@@ -174,6 +171,7 @@ export default function ArticleDetailPage() {
           </div>
         </aside>
       </div>
-    </section>
+      </section>
+    </>
   );
 }

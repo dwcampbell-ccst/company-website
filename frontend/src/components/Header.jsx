@@ -5,6 +5,7 @@ import { useSiteContent } from "../hooks/useSiteContent";
 const navItems = [
   { to: "/", key: "header.nav.home" },
   { to: "/services", key: "header.nav.services" },
+  { to: "/regent", key: "header.nav.regent" },
   { to: "/articles", key: "header.nav.articles" },
   { to: "/about", key: "header.nav.about" },
   { to: "/contact", key: "header.nav.contact" },

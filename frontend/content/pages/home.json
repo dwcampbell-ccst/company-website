@@ -1,0 +1,11 @@
+{
+  "slug": "home",
+  "title": "Home",
+  "heroTitle": "Business Analysis & Systems Engineering",
+  "heroSubtitle": "Delivery with measurable outcomes and executive-ready reporting.",
+  "content": "",
+  "seoTitle": "Campbell Consulting | AI Governance and Systems Engineering | Tallahassee, FL",
+  "seoDescription": "Campbell Consulting (CCST) is an SDVOSB consultancy in Tallahassee, FL. We build AI governance infrastructure: Regent, a runtime control plane that enforces policy on AI agents and keeps a tamper-evident audit trail of everything they do.",
+  "canonicalPath": "/",
+  "ogImage": "/og-consultcampbell.jpg"
+}

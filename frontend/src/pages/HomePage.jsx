@@ -53,6 +53,20 @@ export default function HomePage() {
         </div>
       </section>
 
+      <section className="glass-panel p-6 md:p-8 grid gap-5 md:grid-cols-[1fr_auto] md:items-center fade-in">
+        <div className="space-y-2">
+          <p className="pill inline-flex bg-[#e7efe1] text-[#0f1a0f]">{t("regent.eyebrow")}</p>
+          <h2 className="text-2xl font-bold text-[#0f1a0f]">{t("regent.heading")}</h2>
+          <p className="text-gray-700 max-w-3xl">{t("regent.description")}</p>
+        </div>
+        <Link
+          to="/regent"
+          className="inline-flex w-fit items-center rounded-full bg-[#0f1a0f] px-5 py-2.5 font-semibold text-white hover:bg-black transition"
+        >
+          {t("regent.ctaLabel")}
+        </Link>
+      </section>
+
       <section className="glass-panel p-6 md:p-8 space-y-6 fade-in">
         <div className="flex flex-col gap-2">
           <p className="pill inline-flex bg-white/80 px-3 py-1 text-xs uppercase tracking-[0.18em] text-gray-700 w-fit">

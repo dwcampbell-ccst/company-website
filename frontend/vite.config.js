@@ -17,9 +17,6 @@ export default defineConfig(({ mode }) => {
     }
   }
 
-  const supabaseUrl = env.VITE_SUPABASE_URL || env.SUPABASE_URL || "";
-  const supabaseAnonKey = env.VITE_SUPABASE_ANON_KEY || env.SUPABASE_ANON_KEY || "";
-
   const contactDevPlugin = {
     name: "contact-dev-middleware",
     configureServer(server) {
@@ -95,9 +92,5 @@ export default defineConfig(({ mode }) => {
   return {
     envDir: "..",
     plugins: [react(), contactDevPlugin],
-    define: {
-      "import.meta.env.VITE_SUPABASE_URL": JSON.stringify(supabaseUrl),
-      "import.meta.env.VITE_SUPABASE_ANON_KEY": JSON.stringify(supabaseAnonKey),
-    },
   };
 });

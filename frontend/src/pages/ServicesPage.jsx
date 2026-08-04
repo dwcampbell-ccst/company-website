@@ -19,6 +19,10 @@ export default function ServicesPage() {
       id: "software",
       ctaTo: "/contact?topic=Software%20and%20Automation",
     },
+    {
+      id: "regent",
+      ctaTo: "/regent",
+    },
   ];
 
   return (

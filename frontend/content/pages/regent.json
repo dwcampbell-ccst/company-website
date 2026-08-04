@@ -1,0 +1,11 @@
+{
+  "slug": "regent",
+  "title": "Regent",
+  "heroTitle": "Regent: runtime governance for AI agents",
+  "heroSubtitle": "Policy enforcement and tamper-evident records for governed AI activity.",
+  "content": "",
+  "seoTitle": "Regent | Runtime AI Governance by Campbell Consulting",
+  "seoDescription": "Regent is a runtime governance layer for AI agents: policy enforcement on every turn, a tamper-evident audit chain, and session governance. Built by CCST.",
+  "canonicalPath": "/regent",
+  "ogImage": "/og-consultcampbell.jpg"
+}

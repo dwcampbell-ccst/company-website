@@ -4,6 +4,21 @@ const https = require("https");
 
 const RATE_LIMIT_MAX = 3;
 const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000;
+const MAX_LENGTHS = {
+  name: 120,
+  email: 254,
+  company: 160,
+  phone: 40,
+  topic: 100,
+  subject: 200,
+  message: 5000,
+};
+const ALLOWED_DOWNLOADS = new Set([
+  "Automation_Preview_Pack.zip",
+  "General_Inquiry.pdf",
+  "SLED_Solutions_Brief.zip",
+  "Strategic_Decision_Clarity_Pack.zip",
+]);
 
 function normalizeText(value) {
   if (typeof value !== "string") return "";
@@ -35,6 +50,18 @@ function normalizeTopics(topics) {
 
   const single = normalizeText(topics);
   return single ? [single] : ["General Inquiry"];
+}
+
+function validEmail(value) {
+  return value.length <= MAX_LENGTHS.email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
+
+function exceeds(value, maximum) {
+  return Boolean(value && value.length > maximum);
+}
+
+function containsHeaderBreak(value) {
+  return /[\r\n]/.test(value || "");
 }
 
 function splitName(fullName) {
@@ -191,7 +218,37 @@ module.exports = async (req, res) => {
     return;
   }
 
+  if (
+    exceeds(name, MAX_LENGTHS.name) ||
+    !validEmail(email) ||
+    exceeds(company, MAX_LENGTHS.company) ||
+    exceeds(phone, MAX_LENGTHS.phone) ||
+    exceeds(message, MAX_LENGTHS.message) ||
+    topics.length > 5 ||
+    topics.some((topic) => exceeds(topic, MAX_LENGTHS.topic) || containsHeaderBreak(topic))
+  ) {
+    res.status(400).json({ error: "Invalid field value" });
+    return;
+  }
+
+  if (Boolean(downloadFilename) !== Boolean(downloadPath)) {
+    res.status(400).json({ error: "Invalid download" });
+    return;
+  }
+  if (downloadFilename && !ALLOWED_DOWNLOADS.has(downloadFilename)) {
+    res.status(400).json({ error: "Invalid download" });
+    return;
+  }
+  if (downloadFilename && downloadPath !== `/downloads/${downloadFilename}`) {
+    res.status(400).json({ error: "Invalid download path" });
+    return;
+  }
+
   const subject = normalizeOptionalText(payload.subject) || `Contact: ${topics.join(", ")}`;
+  if (exceeds(subject, MAX_LENGTHS.subject) || containsHeaderBreak(subject)) {
+    res.status(400).json({ error: "Invalid subject" });
+    return;
+  }
 
   const supabaseUrl = process.env.SUPABASE_URL;
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;

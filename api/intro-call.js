@@ -60,7 +60,7 @@ module.exports = async (req, res) => {
     return;
   }
 
-  const userAgent = normalizeText(req.headers?.["user-agent"]);
+  const userAgent = normalizeText(req.headers?.["user-agent"]).slice(0, 512);
   const { error: insertError } = await supabase.from("intro_call_requests").insert({
     ip_address: clientIp,
     user_agent: userAgent || null,

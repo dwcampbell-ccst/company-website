@@ -1,10 +1,18 @@
-import { Outlet } from "react-router-dom";
+import { useEffect } from "react";
+import { Link, Outlet, useLocation } from "react-router-dom";
 import Header from "./Header";
 import { useSiteContent } from "../hooks/useSiteContent";
 
 const Layout = () => {
   const { t } = useSiteContent("global");
   const year = new Date().getFullYear();
+  const location = useLocation();
+
+  useEffect(() => {
+    if (!location.hash) return;
+    const target = document.getElementById(location.hash.slice(1));
+    if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [location.hash, location.pathname]);
 
   return (
     <div className="min-h-screen flex flex-col text-[#0f1a0f]">
@@ -31,6 +39,16 @@ const Layout = () => {
                 <p>{t("footer.line1")}</p>
                 <p>{t("footer.line2")}</p>
                 <p>{t("footer.line3")}</p>
+                <p>
+                  <a
+                    href="https://thesystemsthinkerdwc.substack.com/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-semibold text-[#0f1a0f] hover:text-[#2fb3d5]"
+                  >
+                    {t("footer.systemsThinkerLabel")}
+                  </a>
+                </p>
               </div>
             </div>
 
@@ -38,6 +56,9 @@ const Layout = () => {
               <div className="hidden md:block" />
               <p>
                 (c) {year} {t("footer.copyrightSuffix")}
+              </p>
+              <p className="md:text-right">
+                <Link to="/contact" className="hover:text-[#2fb3d5]">{t("footer.contactLabel")}</Link>
               </p>
             </div>
           </div>

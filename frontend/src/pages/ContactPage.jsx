@@ -292,7 +292,7 @@ export default function ContactPage() {
             </article>
           ) : null}
 
-          <div className="glass-panel bg-white/90 border border-gray-100 p-4 space-y-2">
+          <div id="calendar" className="glass-panel bg-white/90 border border-gray-100 p-4 space-y-2 scroll-mt-32">
             <h3 className="text-lg font-semibold text-[#0f1a0f]">{t("contactInfo.heading")}</h3>
             <ul className="space-y-1 text-sm text-gray-800">
               <li>
@@ -477,4 +477,3 @@ export default function ContactPage() {
     </section>
   );
 }
-
